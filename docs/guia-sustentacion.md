@@ -3,6 +3,10 @@
 Esta guía resume el flujo del sistema y las respuestas esperadas para la
 sustentación. No sustituye la lectura del código: sirve como mapa.
 
+> Para el detalle de cada producción, la explicación de `func`, la precedencia
+> de expresiones y el banco completo de preguntas, ver
+> [`guia-sustentacion-completa.md`](guia-sustentacion-completa.md).
+
 ---
 
 ## 1. Flujo completo de una ejecución

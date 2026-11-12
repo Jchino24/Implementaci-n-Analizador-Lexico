@@ -124,7 +124,8 @@ no vuelve a analizar caracteres.
 │   └── ejecutar_pruebas.sh     # Ejecuta todos los casos y genera evidencias
 ├── evidencias/                 # Salidas completas de cada caso
 └── docs/
-    └── guia-sustentacion.md    # Flujo del sistema y preguntas de sustentación
+    ├── guia-sustentacion.md            # Guía breve
+    └── guia-sustentacion-completa.md   # Guía detallada de defensa
 ```
 
 ---
@@ -399,3 +400,7 @@ Fallidos:        0
 
 La guía breve con el flujo completo, el reparto sugerido y preguntas frecuentes
 está en [`docs/guia-sustentacion.md`](docs/guia-sustentacion.md).
+
+La guía completa —objetivo de la profesora, explicación de cada producción,
+errores, pruebas y preguntas de defensa— está en
+[`docs/guia-sustentacion-completa.md`](docs/guia-sustentacion-completa.md).
