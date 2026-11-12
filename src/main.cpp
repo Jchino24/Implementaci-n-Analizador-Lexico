@@ -72,8 +72,8 @@ void imprimirError(const ErrorCompilacion& error, bool esAdvertencia,
         etiqueta = "[ERROR SINTACTICO]";
     }
 
-    std::cout << etiqueta << " Línea " << error.linea << ", columna "
-              << error.columna << ": " << error.mensaje << "\n";
+    std::cout << etiqueta << " Línea " << error.linea << ": " << error.mensaje
+              << "\n";
 
     if (error.linea >= 1 &&
         error.linea <= static_cast<int>(lineas.size())) {
@@ -96,8 +96,7 @@ void imprimirTokens(const std::vector<Token>& tokens) {
     std::cout << "SECUENCIA DE TOKENS (ANÁLISIS LÉXICO)\n";
     std::cout << kSubseparador << "\n";
     std::cout << std::left << std::setw(5) << "#" << std::setw(24) << "LEXEMA"
-              << std::setw(16) << "TOKEN" << std::setw(7) << "LINEA"
-              << "COLUMNA\n";
+              << std::setw(16) << "TOKEN" << "LINEA\n";
     std::cout << kSubseparador << "\n";
 
     std::size_t numero = 0;
@@ -114,8 +113,7 @@ void imprimirTokens(const std::vector<Token>& tokens) {
 
         std::cout << std::left << std::setw(5) << numero << std::setw(24)
                   << recortar(lexema, 22) << std::setw(16)
-                  << tokenTypeToString(token.tipo) << std::setw(7)
-                  << token.linea << token.columna << "\n";
+                  << tokenTypeToString(token.tipo) << token.linea << "\n";
     }
 
     std::cout << kSubseparador << "\n";
@@ -146,16 +144,14 @@ void imprimirTabla(const TablaSimbolos& tabla) {
     }
 
     std::cout << std::left << std::setw(5) << "#" << std::setw(20) << "NOMBRE"
-              << std::setw(20) << "TIPO" << std::setw(8) << "LINEA"
-              << "COLUMNA\n";
+              << std::setw(20) << "TIPO" << "LINEA\n";
     std::cout << kSubseparador << "\n";
     std::size_t numero = 0;
     for (const Simbolo& simbolo : simbolos) {
         ++numero;
         std::cout << std::left << std::setw(5) << numero << std::setw(20)
                   << recortar(simbolo.nombre, 18) << std::setw(20)
-                  << recortar(simbolo.tipo, 18) << std::setw(8) << simbolo.linea
-                  << simbolo.columna << "\n";
+                  << recortar(simbolo.tipo, 18) << simbolo.linea << "\n";
     }
     std::cout << "\n";
 }
