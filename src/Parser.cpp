@@ -75,7 +75,6 @@ bool Parser::analizar() {
         return a.columna < b.columna;
     };
     std::stable_sort(errores.begin(), errores.end(), porPosicion);
-    std::stable_sort(advertencias.begin(), advertencias.end(), porPosicion);
 
     return programaValido && errores.empty();
 }
@@ -108,8 +107,19 @@ const Token& Parser::actual() const {
     return flujo[pos];
 }
 
+const Token& Parser::siguiente() const {
+    if (pos + 1 < flujo.size()) {
+        return flujo[pos + 1];
+    }
+    return flujo[pos];
+}
+
 bool Parser::esFin() const {
     return actual().tipo == FIN_ARCHIVO;
+}
+
+bool Parser::siguienteEs(TokenType tipo) const {
+    return siguiente().tipo == tipo;
 }
 
 void Parser::avanzar() {
@@ -128,10 +138,6 @@ bool Parser::consumir(TokenType tipo) {
         return true;
     }
     return false;
-}
-
-bool Parser::iniciaSentencia(TokenType tipo) const {
-    return tipo == ID || esTipoBase(tipo);
 }
 
 bool Parser::esTipoBase(TokenType tipo) {
@@ -173,8 +179,15 @@ void Parser::sincronizar() {
     }
 }
 
+bool Parser::esInicioFuncion() const {
+    if (!(comprobar(VOID) || esTipoBase(actual().tipo))) {
+        return false;
+    }
+    return siguienteEs(ID);
+}
+
 // ---------------------------------------------------------------------------
-// Reporte de errores y advertencias
+// Reporte de errores
 // ---------------------------------------------------------------------------
 
 void Parser::reportar(TipoError tipo, int linea, int columna,
@@ -218,20 +231,6 @@ void Parser::errorPuntoComa(const std::string& contexto) {
              pista);
 }
 
-void Parser::advertencia(int linea, int columna, const std::string& mensaje,
-                         const std::string& pista) {
-    if (advertencias.size() >= 100) {
-        return;
-    }
-    ErrorCompilacion aviso;
-    aviso.tipo = TipoError::SINTACTICO;
-    aviso.linea = linea;
-    aviso.columna = columna;
-    aviso.mensaje = mensaje;
-    aviso.pista = pista;
-    advertencias.push_back(std::move(aviso));
-}
-
 // ---------------------------------------------------------------------------
 // Traza de reconocimiento
 // ---------------------------------------------------------------------------
@@ -252,87 +251,153 @@ void Parser::nodo(const std::string& etiqueta) {
 }
 
 // ---------------------------------------------------------------------------
-// PROGRAMA -> TIPO_RETORNO PRINCIPAL BLOQUE
+// PROGRAMA -> LISTA_FUNCIONES PRINCIPAL
 // ---------------------------------------------------------------------------
 
 bool Parser::reconocerPrograma() {
     abrirNodo("PROGRAMA");
     CierreNodo cierre{this};
-    bool ok = true;
 
-    if (comprobar(VOID) || esTipoBase(actual().tipo)) {
-        const InfoTipo retorno = reconocerTipoBase(true);
-        ok = retorno.valido && ok;
-    } else {
-        errorActual("un tipo de retorno ('void', 'int', ...) antes de 'main'",
-                    "PROGRAMA",
-                    "La cabecera del programa debe ser: void main() { ... }");
-        ok = false;
-        if (!comprobar(MAIN)) {
-            return false;
-        }
-    }
-
-    if (!comprobar(MAIN)) {
-        errorActual("'main'", "PROGRAMA",
-                    "Todo programa LP debe tener una función principal main().");
-        return false;
-    }
-
-    ok = reconocerPrincipal() && ok;
-    ok = reconocerBloque() && ok;
+    bool ok = reconocerListaFunciones();
+    const bool principalOk = reconocerPrincipal();
 
     if (!esFin()) {
         const Token& sobrante = actual();
         reportar(TipoError::SINTACTICO, sobrante.linea, sobrante.columna,
                  "contenido inesperado después del bloque principal: se encontró " +
                      describirToken(sobrante),
-                 "Solo puede existir una función main() con su bloque.");
+                 "Solo puede existir una función main() con su bloque al final.");
         ok = false;
         while (!esFin()) {
             avanzar();
         }
     }
 
+    return ok && principalOk;
+}
+
+// ---------------------------------------------------------------------------
+// LISTA_FUNCIONES -> FUNCION*
+// ---------------------------------------------------------------------------
+
+bool Parser::reconocerListaFunciones() {
+    abrirNodo("LISTA_FUNCIONES");
+    CierreNodo cierre{this};
+
+    bool ok = true;
+    while (esInicioFuncion()) {
+        ok = reconocerFuncion() && ok;
+    }
     return ok;
 }
 
 // ---------------------------------------------------------------------------
-// PRINCIPAL -> main ( )
+// FUNCION -> TIPO_RETORNO ID ( LISTA_PARAMETROS ) BLOQUE
+// ---------------------------------------------------------------------------
+
+bool Parser::reconocerFuncion() {
+    abrirNodo("FUNCION");
+    CierreNodo cierre{this};
+
+    bool ok = true;
+    const InfoTipo retorno = reconocerTipoRetorno();
+    ok = retorno.valido && ok;
+
+    if (!comprobar(ID)) {
+        errorActual("un nombre de función (ID)", "FUNCION",
+                    "Ejemplo: int suma(int a, int b) { ... }");
+        return false;
+    }
+
+    const Token nombre = actual();
+    nodo("ID: " + nombre.lexema);
+    avanzar();
+    ++funciones;
+
+    if (!consumir(PAR_IZQ)) {
+        errorActual("'(' después del nombre de la función", "FUNCION",
+                    "Formato esperado: tipo nombre(parámetros) { ... }");
+        ok = false;
+        // Recuperacion: avanzar hasta el bloque de la funcion.
+        while (!esFin() && !comprobar(LLAVE_IZQ)) {
+            avanzar();
+        }
+    } else {
+        if (!comprobar(PAR_DER)) {
+            ok = reconocerListaParametros() && ok;
+        }
+        if (!consumir(PAR_DER)) {
+            errorActual("')' para cerrar los parámetros de la función", "FUNCION");
+            ok = false;
+            while (!esFin() && !comprobar(PAR_DER) && !comprobar(LLAVE_IZQ)) {
+                avanzar();
+            }
+            consumir(PAR_DER);
+        }
+    }
+
+    if (comprobar(LLAVE_IZQ)) {
+        ok = reconocerBloque() && ok;
+    } else {
+        errorActual("'{' para iniciar el bloque de la función", "FUNCION");
+        ok = false;
+    }
+
+    return ok;
+}
+
+// ---------------------------------------------------------------------------
+// PRINCIPAL -> [TIPO_RETORNO] main ( ) BLOQUE
 // ---------------------------------------------------------------------------
 
 bool Parser::reconocerPrincipal() {
     abrirNodo("PRINCIPAL");
     CierreNodo cierre{this};
+
     bool ok = true;
 
+    // Se acepta tanto `main()` como `void main()` / `int main()`.
+    if ((comprobar(VOID) || esTipoBase(actual().tipo)) && siguienteEs(MAIN)) {
+        const InfoTipo retorno = reconocerTipoRetorno();
+        ok = retorno.valido && ok;
+    }
+
     if (!consumir(MAIN)) {
-        errorActual("'main'", "PRINCIPAL");
+        errorActual("'main'", "PRINCIPAL",
+                    "Todo programa LP debe terminar con main() y su bloque.");
         return false;
     }
 
     if (!consumir(PAR_IZQ)) {
         errorActual("'(' después de 'main'", "PRINCIPAL",
-                    "La firma de main debe ser: void main() { ... }");
-        return false;
-    }
-
-    if (!consumir(PAR_DER)) {
+                    "La firma de main debe ser: main() { ... }");
+        ok = false;
+        consumir(PAR_DER);
+    } else if (!consumir(PAR_DER)) {
         errorActual("')' para cerrar los parámetros de main", "PRINCIPAL",
                     "En esta etapa main() no recibe parámetros.");
         ok = false;
-        // Recuperacion: descartar parametros no soportados hasta ')' o '{'.
         while (!esFin() && !comprobar(PAR_DER) && !comprobar(LLAVE_IZQ)) {
             avanzar();
         }
         consumir(PAR_DER);
     }
 
+    nodo("main ( )");
+
+    if (comprobar(LLAVE_IZQ)) {
+        ok = reconocerBloque() && ok;
+    } else {
+        errorActual("'{' para iniciar el bloque de main", "PRINCIPAL",
+                    "main() debe ir seguido de su bloque: { ... }");
+        ok = false;
+    }
+
     return ok;
 }
 
 // ---------------------------------------------------------------------------
-// BLOQUE -> { LISTA_SENTENCIAS }
+// BLOQUE -> { LISTA_VARIABLES COMANDOS }
 // ---------------------------------------------------------------------------
 
 bool Parser::reconocerBloque() {
@@ -341,53 +406,13 @@ bool Parser::reconocerBloque() {
 
     if (!consumir(LLAVE_IZQ)) {
         errorActual("'{' para iniciar el bloque", "BLOQUE",
-                    "El cuerpo de main debe ir entre llaves: { ... }");
+                    "El cuerpo debe ir entre llaves: { ... }");
         return false;
     }
 
     const int lineaApertura = flujo[pos - 1].linea;
-    bool ok = true;
-
-    while (!esFin() && !comprobar(LLAVE_DER)) {
-        if (esTipoBase(actual().tipo)) {
-            ok = reconocerDeclaracion() && ok;
-        } else if (comprobar(ID)) {
-            ok = reconocerAsignacion() && ok;
-        } else if (comprobar(VOID)) {
-            const Token& token = actual();
-            reportar(TipoError::SINTACTICO, token.linea, token.columna,
-                     "tipo 'void' no permitido en una declaración dentro del bloque",
-                     "'void' solo se usa en la cabecera del programa.");
-            avanzar();
-            sincronizar();
-            consumir(PUNTO_COMA);
-            ok = false;
-        } else if (comprobar(PUNTO_COMA)) {
-            const Token& token = actual();
-            reportar(TipoError::SINTACTICO, token.linea, token.columna,
-                     "sentencia vacía: se encontró ';' sin una instrucción",
-                     "Elimine el ';' sobrante o escriba la declaración/asignación.");
-            avanzar();
-            ok = false;
-        } else if (comprobar(LLAVE_IZQ)) {
-            const Token& token = actual();
-            reportar(TipoError::SINTACTICO, token.linea, token.columna,
-                     "bloque anidado no permitido en esta etapa",
-                     "El Entregable 1 solo admite un bloque para main().");
-            avanzar();
-            ok = false;
-        } else {
-            const Token& token = actual();
-            reportar(TipoError::SINTACTICO, token.linea, token.columna,
-                     "token inesperado " + describirToken(token) +
-                         "; se esperaba una declaración o una asignación",
-                     "Revise la línea o la sentencia anterior.");
-            avanzar();
-            sincronizar();
-            consumir(PUNTO_COMA);
-            ok = false;
-        }
-    }
+    bool ok = reconocerListaVariables();
+    ok = reconocerComandos() && ok;
 
     if (consumir(LLAVE_DER)) {
         nodo("BLOQUE: cierre '}' en la línea " + std::to_string(flujo[pos - 1].linea));
@@ -411,7 +436,22 @@ bool Parser::reconocerBloque() {
 }
 
 // ---------------------------------------------------------------------------
-// DECLARACION -> TIPO LISTA_VARIABLES
+// LISTA_VARIABLES -> (DECLARACION)*
+// ---------------------------------------------------------------------------
+
+bool Parser::reconocerListaVariables() {
+    abrirNodo("LISTA_VARIABLES");
+    CierreNodo cierre{this};
+
+    bool ok = true;
+    while (esTipoBase(actual().tipo)) {
+        ok = reconocerDeclaracion() && ok;
+    }
+    return ok;
+}
+
+// ---------------------------------------------------------------------------
+// DECLARACION -> TIPO LISTA_VARIABLES_DECLARACION
 // ---------------------------------------------------------------------------
 
 bool Parser::reconocerDeclaracion() {
@@ -420,11 +460,505 @@ bool Parser::reconocerDeclaracion() {
 
     const InfoTipo tipo = reconocerTipo();
     bool ok = tipo.valido;
-    ok = reconocerListaVariables(tipo) && ok;
+    ok = reconocerListaVariablesDeclaracion(tipo) && ok;
     if (tipo.valido) {
         ++declaraciones;
     }
     return ok;
+}
+
+// ---------------------------------------------------------------------------
+// LISTA_VARIABLES (de una declaración) -> LISTA_ID ;
+// ---------------------------------------------------------------------------
+
+bool Parser::reconocerListaVariablesDeclaracion(const InfoTipo& tipo) {
+    abrirNodo("LISTA_VARIABLES");
+    CierreNodo cierre{this};
+
+    bool listaOk = true;
+    const std::vector<std::string> nombres = reconocerListaId(tipo, listaOk);
+    if (nombres.empty()) {
+        while (!esFin() && !comprobar(PUNTO_COMA) && !comprobar(LLAVE_DER)) {
+            avanzar();
+        }
+        consumir(PUNTO_COMA);
+        return false;
+    }
+
+    if (consumir(PUNTO_COMA)) {
+        nodo("PUNTO_COMA: ;");
+        return listaOk;
+    }
+
+    if (comprobar(ASIGNACION)) {
+        const Token& encontrado = actual();
+        reportar(TipoError::SINTACTICO, encontrado.linea, encontrado.columna,
+                 "no se admite inicialización en la declaración en esta etapa; "
+                 "se encontró '='",
+                 "Declare primero y asigne después: int edad; edad = 20;");
+        sincronizar();
+        consumir(PUNTO_COMA);
+        return false;
+    }
+
+    errorPuntoComa("la declaración (LISTA_VARIABLES)");
+
+    // Recuperacion: si el token actual inicia otra declaración o un comando,
+    // se deja intacto para que el bloque lo reconozca.
+    const bool iniciaOtraCosa =
+        esTipoBase(actual().tipo) || comprobar(ID) || comprobar(IF) ||
+        comprobar(WHILE) || comprobar(FUNC) || comprobar(SCANF) ||
+        comprobar(PRINTLN) || comprobar(RETURN) || comprobar(LLAVE_DER);
+    if (!iniciaOtraCosa && !esFin()) {
+        sincronizar();
+        consumir(PUNTO_COMA);
+    }
+    return false;
+}
+
+// ---------------------------------------------------------------------------
+// COMANDOS -> COMANDO*
+// ---------------------------------------------------------------------------
+
+bool Parser::reconocerComandos() {
+    abrirNodo("COMANDOS");
+    CierreNodo cierre{this};
+
+    bool ok = true;
+    while (!esFin() && !comprobar(LLAVE_DER)) {
+        if (esTipoBase(actual().tipo)) {
+            const Token& token = actual();
+            reportar(TipoError::SINTACTICO, token.linea, token.columna,
+                     "las variables deben declararse antes de los comandos",
+                     "Mueva la declaración al inicio del bloque, antes de la primera instrucción.");
+            ok = reconocerDeclaracion() && ok;
+            ok = false;
+        } else {
+            ok = reconocerComando() && ok;
+        }
+    }
+    return ok;
+}
+
+// ---------------------------------------------------------------------------
+// COMANDO -> ASIGNACION | IF | WHILE | LLAMADA | RETURN | SCANF | PRINTLN
+// ---------------------------------------------------------------------------
+
+bool Parser::reconocerComando() {
+    if (comprobar(ID)) {
+        if (siguienteEs(PAR_IZQ)) {
+            const Token& token = actual();
+            reportar(TipoError::SINTACTICO, token.linea, token.columna,
+                     "las llamadas a función deben comenzar con 'func'; se encontró '" +
+                         token.lexema + "'",
+                     "Ejemplo: func nombre(argumentos);");
+            while (!esFin() && !comprobar(PUNTO_COMA) && !comprobar(LLAVE_DER)) {
+                avanzar();
+            }
+            consumir(PUNTO_COMA);
+            return false;
+        }
+        return reconocerAsignacion();
+    }
+    if (comprobar(IF)) {
+        return reconocerIf();
+    }
+    if (comprobar(WHILE)) {
+        return reconocerWhile();
+    }
+    if (comprobar(FUNC)) {
+        return reconocerLlamada(true);
+    }
+    if (comprobar(SCANF) || comprobar(PRINTLN)) {
+        return reconocerLlamadaIncorporada();
+    }
+    if (comprobar(RETURN)) {
+        return reconocerReturn();
+    }
+    if (comprobar(PUNTO_COMA)) {
+        const Token& token = actual();
+        reportar(TipoError::SINTACTICO, token.linea, token.columna,
+                 "sentencia vacía: se encontró ';' sin una instrucción",
+                 "Elimine el ';' sobrante o escriba la instrucción.");
+        avanzar();
+        return false;
+    }
+    if (comprobar(LLAVE_IZQ)) {
+        const Token& token = actual();
+        reportar(TipoError::SINTACTICO, token.linea, token.columna,
+                 "bloque inesperado: se esperaba una instrucción",
+                 "Los bloques solo aparecen después de main, if, else, while o una función.");
+        return reconocerBloque();
+    }
+
+    const Token& token = actual();
+    reportar(TipoError::SINTACTICO, token.linea, token.columna,
+             "token inesperado " + describirToken(token) +
+                 "; se esperaba una asignación, if, while, func, return, scanf o println",
+             "Revise la línea o la instrucción anterior.");
+    avanzar();
+    if (comprobar(LLAVE_IZQ)) {
+        reconocerBloque();
+    } else {
+        sincronizar();
+        consumir(PUNTO_COMA);
+    }
+    return false;
+}
+
+// ---------------------------------------------------------------------------
+// ASIGNACION -> ID ( [ COMPLEMENTO ] )* = COMPLEMENTO ;
+// ---------------------------------------------------------------------------
+
+bool Parser::reconocerAsignacion() {
+    abrirNodo("ASIGNACION");
+    CierreNodo cierre{this};
+
+    if (!comprobar(ID)) {
+        errorActual("un identificador al inicio de la asignación", "ASIGNACION");
+        return false;
+    }
+
+    const Token objetivo = actual();
+    avanzar();
+    nodo("OBJETIVO: " + objetivo.lexema);
+
+    bool ok = true;
+    if (comprobar(CORCH_IZQ)) {
+        ok = reconocerSubindices() && ok;
+    }
+
+    if (!consumir(ASIGNACION)) {
+        const Token& encontrado = actual();
+        reportar(TipoError::SINTACTICO, encontrado.linea, encontrado.columna,
+                 "se esperaba '=' en la asignación de '" + objetivo.lexema +
+                     "', pero se encontró " + describirToken(encontrado),
+                 "Formato esperado: variable = expresión;");
+        while (!esFin() && !comprobar(PUNTO_COMA) && !comprobar(LLAVE_DER)) {
+            avanzar();
+        }
+        consumir(PUNTO_COMA);
+        return false;
+    }
+    nodo("ASIGNACION: =");
+
+    ok = reconocerComplemento() && ok;
+
+    if (consumir(PUNTO_COMA)) {
+        nodo("PUNTO_COMA: ;");
+    } else {
+        errorPuntoComa("la asignación (ASIGNACION)");
+        if (!comprobar(LLAVE_DER) && !esFin()) {
+            sincronizar();
+            consumir(PUNTO_COMA);
+        }
+        ok = false;
+    }
+
+    ++asignaciones;
+    return ok;
+}
+
+// ---------------------------------------------------------------------------
+// IF -> if ( COMPLEMENTO ) BLOQUE [ else ( IF | BLOQUE ) ]
+// ---------------------------------------------------------------------------
+
+bool Parser::reconocerIf() {
+    abrirNodo("IF");
+    CierreNodo cierre{this};
+
+    bool ok = true;
+    if (!consumir(IF)) {
+        errorActual("'if'", "IF");
+        return false;
+    }
+
+    if (!consumir(PAR_IZQ)) {
+        errorActual("'(' después de 'if'", "IF",
+                    "Formato esperado: if (condición) { ... }");
+        ok = false;
+    }
+
+    if (!comprobar(LLAVE_IZQ)) {
+        ok = reconocerComplemento() && ok;
+    }
+
+    if (!consumir(PAR_DER)) {
+        errorActual("')' para cerrar la condición de 'if'", "IF");
+        ok = false;
+        while (!esFin() && !comprobar(PAR_DER) && !comprobar(LLAVE_IZQ)) {
+            avanzar();
+        }
+        consumir(PAR_DER);
+    }
+
+    if (comprobar(LLAVE_IZQ)) {
+        ok = reconocerBloque() && ok;
+    } else {
+        errorActual("'{' para iniciar el bloque de 'if'", "IF");
+        ok = false;
+    }
+
+    if (consumir(ELSE)) {
+        if (comprobar(IF)) {
+            ok = reconocerIf() && ok;
+        } else if (comprobar(LLAVE_IZQ)) {
+            ok = reconocerBloque() && ok;
+        } else {
+            errorActual("'{' o 'if' después de 'else'", "IF",
+                        "Formato esperado: else { ... } o else if (...) { ... }");
+            ok = false;
+        }
+    }
+
+    return ok;
+}
+
+// ---------------------------------------------------------------------------
+// WHILE -> while ( COMPLEMENTO ) BLOQUE
+// ---------------------------------------------------------------------------
+
+bool Parser::reconocerWhile() {
+    abrirNodo("WHILE");
+    CierreNodo cierre{this};
+
+    bool ok = true;
+    if (!consumir(WHILE)) {
+        errorActual("'while'", "WHILE");
+        return false;
+    }
+
+    if (!consumir(PAR_IZQ)) {
+        errorActual("'(' después de 'while'", "WHILE",
+                    "Formato esperado: while (condición) { ... }");
+        ok = false;
+    }
+
+    if (!comprobar(LLAVE_IZQ)) {
+        ok = reconocerComplemento() && ok;
+    }
+
+    if (!consumir(PAR_DER)) {
+        errorActual("')' para cerrar la condición de 'while'", "WHILE");
+        ok = false;
+        while (!esFin() && !comprobar(PAR_DER) && !comprobar(LLAVE_IZQ)) {
+            avanzar();
+        }
+        consumir(PAR_DER);
+    }
+
+    if (comprobar(LLAVE_IZQ)) {
+        ok = reconocerBloque() && ok;
+    } else {
+        errorActual("'{' para iniciar el bloque de 'while'", "WHILE");
+        ok = false;
+    }
+
+    return ok;
+}
+
+// ---------------------------------------------------------------------------
+// LLAMADA -> func ID ( LISTA_ARGUMENTOS ) [ ; ]
+// ---------------------------------------------------------------------------
+
+bool Parser::reconocerLlamada(bool consumirPuntoComa) {
+    abrirNodo("LLAMADA");
+    CierreNodo cierre{this};
+
+    bool ok = true;
+    if (!consumir(FUNC)) {
+        errorActual("'func'", "LLAMADA");
+        return false;
+    }
+
+    if (!comprobar(ID)) {
+        errorActual("un nombre de función (ID)", "LLAMADA",
+                    "Formato esperado: func nombre(argumentos);");
+        ok = false;
+    } else {
+        nodo("ID: " + actual().lexema);
+        avanzar();
+    }
+
+    if (!consumir(PAR_IZQ)) {
+        errorActual("'(' después del nombre de la función", "LLAMADA");
+        ok = false;
+        if (consumirPuntoComa) {
+            sincronizar();
+            consumir(PUNTO_COMA);
+        }
+        return false;
+    }
+
+    if (!comprobar(PAR_DER)) {
+        ok = reconocerListaArgumentos() && ok;
+    }
+    if (!consumir(PAR_DER)) {
+        errorActual("')' para cerrar los argumentos de la llamada", "LLAMADA");
+        ok = false;
+        while (!esFin() && !comprobar(PAR_DER) && !comprobar(PUNTO_COMA) &&
+               !comprobar(LLAVE_DER)) {
+            avanzar();
+        }
+        consumir(PAR_DER);
+    }
+
+    if (consumirPuntoComa) {
+        if (consumir(PUNTO_COMA)) {
+            nodo("PUNTO_COMA: ;");
+        } else {
+            errorPuntoComa("la llamada a función (LLAMADA)");
+            ok = false;
+        }
+    }
+
+    return ok;
+}
+
+// ---------------------------------------------------------------------------
+// LLAMADA INCORPORADA -> (scanf|println) ( LISTA_ARGUMENTOS ) ;
+// ---------------------------------------------------------------------------
+
+bool Parser::reconocerLlamadaIncorporada() {
+    abrirNodo("LLAMADA");
+    CierreNodo cierre{this};
+
+    bool ok = true;
+    const Token palabra = actual();
+    nodo("ID: " + palabra.lexema);
+    avanzar();
+
+    if (!consumir(PAR_IZQ)) {
+        errorActual("'(' después de '" + palabra.lexema + "'", "LLAMADA");
+        ok = false;
+        sincronizar();
+        consumir(PUNTO_COMA);
+        return false;
+    }
+
+    if (!comprobar(PAR_DER)) {
+        ok = reconocerListaArgumentos() && ok;
+    }
+    if (!consumir(PAR_DER)) {
+        errorActual("')' para cerrar los argumentos de '" + palabra.lexema + "'",
+                    "LLAMADA");
+        ok = false;
+        while (!esFin() && !comprobar(PAR_DER) && !comprobar(PUNTO_COMA) &&
+               !comprobar(LLAVE_DER)) {
+            avanzar();
+        }
+        consumir(PAR_DER);
+    }
+
+    if (consumir(PUNTO_COMA)) {
+        nodo("PUNTO_COMA: ;");
+    } else {
+        errorPuntoComa("la llamada incorporada (LLAMADA)");
+        ok = false;
+    }
+
+    return ok;
+}
+
+// ---------------------------------------------------------------------------
+// RETURN -> return [ COMPLEMENTO ] ;
+// ---------------------------------------------------------------------------
+
+bool Parser::reconocerReturn() {
+    abrirNodo("RETURN");
+    CierreNodo cierre{this};
+
+    bool ok = true;
+    if (!consumir(RETURN)) {
+        errorActual("'return'", "RETURN");
+        return false;
+    }
+
+    if (!comprobar(PUNTO_COMA)) {
+        ok = reconocerComplemento() && ok;
+    }
+
+    if (consumir(PUNTO_COMA)) {
+        nodo("PUNTO_COMA: ;");
+    } else {
+        errorPuntoComa("la sentencia RETURN");
+        if (!comprobar(LLAVE_DER) && !esFin()) {
+            sincronizar();
+            consumir(PUNTO_COMA);
+        }
+        ok = false;
+    }
+
+    return ok;
+}
+
+// ---------------------------------------------------------------------------
+// LISTA_PARAMETROS -> TIPO ID (DIMENSION*) ( , ... )*
+// ---------------------------------------------------------------------------
+
+bool Parser::reconocerListaParametros() {
+    abrirNodo("PARAMETROS");
+    CierreNodo cierre{this};
+
+    bool ok = true;
+    while (true) {
+        const InfoTipo tipo = reconocerTipo();
+        if (!tipo.valido) {
+            ok = false;
+            break;
+        }
+
+        if (!comprobar(ID)) {
+            errorActual("un nombre de parámetro (ID)", "PARAMETROS");
+            ok = false;
+            break;
+        }
+
+        const Token nombre = actual();
+        avanzar();
+
+        InfoTipo tipoParametro = tipo;
+        while (comprobar(CORCH_IZQ)) {
+            if (!reconocerDimension(tipoParametro)) {
+                ok = false;
+                break;
+            }
+        }
+
+        nodo("PARAMETRO: " + nombre.lexema + " (" + tipoParametro.completo + ")");
+
+        if (!consumir(COMA)) {
+            break;
+        }
+    }
+
+    return ok;
+}
+
+// ---------------------------------------------------------------------------
+// LISTA_ARGUMENTOS -> COMPLEMENTO ( , COMPLEMENTO )*
+// ---------------------------------------------------------------------------
+
+bool Parser::reconocerListaArgumentos() {
+    abrirNodo("ARGUMENTOS");
+    CierreNodo cierre{this};
+
+    bool ok = true;
+    while (true) {
+        ok = reconocerComplemento() && ok;
+        if (!consumir(COMA)) {
+            break;
+        }
+    }
+    return ok;
+}
+
+// ---------------------------------------------------------------------------
+// TIPO_RETORNO -> void | TIPO_BASE
+// ---------------------------------------------------------------------------
+
+Parser::InfoTipo Parser::reconocerTipoRetorno() {
+    return reconocerTipoBase(true);
 }
 
 // ---------------------------------------------------------------------------
@@ -445,7 +979,7 @@ Parser::InfoTipo Parser::reconocerTipo() {
 }
 
 // ---------------------------------------------------------------------------
-// TIPO_BASE -> int | float | char | boolean   (void solo en la cabecera)
+// TIPO_BASE -> int | float | char | boolean   (void solo como retorno)
 // ---------------------------------------------------------------------------
 
 Parser::InfoTipo Parser::reconocerTipoBase(bool permitirVoid) {
@@ -457,12 +991,11 @@ Parser::InfoTipo Parser::reconocerTipoBase(bool permitirVoid) {
         tipo.base = token.lexema;
         tipo.completo = token.lexema;
         tipo.valido = true;
-        nodo((permitirVoid ? "TIPO_RETORNO: " : "TIPO_BASE: ") +
-             token.lexema);
+        nodo((permitirVoid ? "TIPO_RETORNO: " : "TIPO_BASE: ") + token.lexema);
         avanzar();
     } else {
         errorActual(permitirVoid
-                        ? "un tipo de dato ('void', 'int', 'float', 'char', 'boolean')"
+                        ? "un tipo de retorno ('void', 'int', 'float', 'char', 'boolean')"
                         : "un tipo de dato ('int', 'float', 'char', 'boolean')",
                     "TIPO_BASE");
     }
@@ -510,52 +1043,7 @@ bool Parser::reconocerDimension(InfoTipo& tipo) {
 }
 
 // ---------------------------------------------------------------------------
-// LISTA_VARIABLES -> LISTA_ID ;
-// ---------------------------------------------------------------------------
-
-bool Parser::reconocerListaVariables(const InfoTipo& tipo) {
-    abrirNodo("LISTA_VARIABLES");
-    CierreNodo cierre{this};
-
-    bool listaOk = true;
-    const std::vector<std::string> nombres = reconocerListaId(tipo, listaOk);
-    if (nombres.empty()) {
-        while (!esFin() && !comprobar(PUNTO_COMA) && !comprobar(LLAVE_DER)) {
-            avanzar();
-        }
-        consumir(PUNTO_COMA);
-        return false;
-    }
-
-    if (consumir(PUNTO_COMA)) {
-        nodo("PUNTO_COMA: ;");
-        return listaOk;
-    }
-
-    if (comprobar(ASIGNACION)) {
-        const Token& encontrado = actual();
-        reportar(TipoError::SINTACTICO, encontrado.linea, encontrado.columna,
-                 "no se admite inicialización en la declaración en esta etapa; "
-                 "se encontró '='",
-                 "Declare primero y asigne después: int edad; edad = 20;");
-        sincronizar();
-        consumir(PUNTO_COMA);
-        return false;
-    }
-
-    errorPuntoComa("la declaración (LISTA_VARIABLES)");
-    // Recuperacion: si el token actual inicia otra sentencia, se deja intacto
-    // para que el bloque la reconozca (caso clasico: falta ';' en una
-    // declaración seguida de una asignación).
-    if (!iniciaSentencia(actual().tipo) && !comprobar(LLAVE_DER) && !esFin()) {
-        sincronizar();
-        consumir(PUNTO_COMA);
-    }
-    return false;
-}
-
-// ---------------------------------------------------------------------------
-// LISTA_ID -> ID (, ID)*
+// LISTA_ID -> ID DIMENSION* ( , ID DIMENSION* )*
 // ---------------------------------------------------------------------------
 
 std::vector<std::string> Parser::reconocerListaId(const InfoTipo& tipo, bool& ok) {
@@ -577,10 +1065,8 @@ std::vector<std::string> Parser::reconocerListaId(const InfoTipo& tipo, bool& ok
         avanzar();
         nombres.push_back(token.lexema);
 
-        // Dimensiones escritas despues del identificador (estilo C):
-        //   int notas[10];
-        // Tambien se aceptan despues del tipo (estilo Java/LP):
-        //   int[10] notas;
+        // Dimensiones después del identificador (estilo C): int notas[10];
+        // También se aceptan después del tipo (int[10] notas;).
         InfoTipo tipoVariable = tipo;
         while (comprobar(CORCH_IZQ)) {
             if (!reconocerDimension(tipoVariable)) {
@@ -589,21 +1075,12 @@ std::vector<std::string> Parser::reconocerListaId(const InfoTipo& tipo, bool& ok
             }
         }
 
-        const Simbolo* previo = tabla.buscar(token.lexema);
         Simbolo simbolo;
         simbolo.nombre = token.lexema;
         simbolo.tipo = tipoVariable.completo;
         simbolo.linea = token.linea;
         simbolo.columna = token.columna;
-
-        if (!tabla.insertar(simbolo)) {
-            advertencia(token.linea, token.columna,
-                        "la variable '" + token.lexema + "' ya había sido declarada" +
-                            (previo != nullptr
-                                 ? " en la línea " + std::to_string(previo->linea)
-                                 : ""),
-                        "Se conserva la primera declaración en la tabla de símbolos.");
-        }
+        tabla.insertar(simbolo);  // Solo registro; no se valida semántica.
 
         nodo("ID: " + token.lexema + " (" + tipoVariable.completo + ")");
 
@@ -616,66 +1093,6 @@ std::vector<std::string> Parser::reconocerListaId(const InfoTipo& tipo, bool& ok
 }
 
 // ---------------------------------------------------------------------------
-// ASIGNACION -> ID ( [ COMPLEMENTO ] )* = COMPLEMENTO ;
-// ---------------------------------------------------------------------------
-
-bool Parser::reconocerAsignacion() {
-    abrirNodo("ASIGNACION");
-    CierreNodo cierre{this};
-
-    if (!comprobar(ID)) {
-        errorActual("un identificador al inicio de la asignación", "ASIGNACION");
-        return false;
-    }
-
-    const Token objetivo = actual();
-    avanzar();
-    nodo("OBJETIVO: " + objetivo.lexema);
-
-    bool ok = true;
-    if (comprobar(CORCH_IZQ)) {
-        ok = reconocerSubindices() && ok;
-    }
-
-    if (tabla.buscar(objetivo.lexema) == nullptr) {
-        advertencia(objetivo.linea, objetivo.columna,
-                    "la variable '" + objetivo.lexema +
-                        "' se usa sin haber sido declarada",
-                    "Declárela antes de asignarle un valor.");
-    }
-
-    if (!consumir(ASIGNACION)) {
-        const Token& encontrado = actual();
-        reportar(TipoError::SINTACTICO, encontrado.linea, encontrado.columna,
-                 "se esperaba '=' en la asignación de '" + objetivo.lexema +
-                     "', pero se encontró " + describirToken(encontrado),
-                 "Formato esperado: variable = expresión;");
-        while (!esFin() && !comprobar(PUNTO_COMA) && !comprobar(LLAVE_DER)) {
-            avanzar();
-        }
-        consumir(PUNTO_COMA);
-        return false;
-    }
-    nodo("ASIGNACION: =");
-
-    ok = reconocerComplemento() && ok;
-
-    if (consumir(PUNTO_COMA)) {
-        nodo("PUNTO_COMA: ;");
-    } else {
-        errorPuntoComa("la asignación (ASIGNACION)");
-        if (!iniciaSentencia(actual().tipo) && !comprobar(LLAVE_DER) && !esFin()) {
-            sincronizar();
-            consumir(PUNTO_COMA);
-        }
-        ok = false;
-    }
-
-    ++asignaciones;
-    return ok;
-}
-
-// ---------------------------------------------------------------------------
 // Subindices del lado izquierdo: [ COMPLEMENTO ] [ COMPLEMENTO ] ...
 // ---------------------------------------------------------------------------
 
@@ -683,7 +1100,7 @@ bool Parser::reconocerSubindices() {
     bool ok = true;
     while (comprobar(CORCH_IZQ)) {
         avanzar();
-        if (!reconocerExpresion()) {
+        if (!reconocerComplemento()) {
             ok = false;
             break;
         }
@@ -697,7 +1114,7 @@ bool Parser::reconocerSubindices() {
 }
 
 // ---------------------------------------------------------------------------
-// COMPLEMENTO -> EXPRESION [ COMP EXPRESION ]
+// COMPLEMENTO -> OR
 // ---------------------------------------------------------------------------
 
 bool Parser::reconocerComplemento() {
@@ -705,15 +1122,8 @@ bool Parser::reconocerComplemento() {
     CierreNodo cierre{this};
 
     const std::size_t inicio = pos;
-    if (!reconocerExpresion()) {
+    if (!reconocerOr()) {
         return false;
-    }
-
-    while (comprobar(COMP)) {
-        avanzar();
-        if (!reconocerExpresion()) {
-            return false;
-        }
     }
 
     nodo("EXPRESION: " + textoEntre(inicio, pos));
@@ -721,17 +1131,16 @@ bool Parser::reconocerComplemento() {
 }
 
 // ---------------------------------------------------------------------------
-// EXPRESION -> TERMINO ( (+ | - | ||) TERMINO )*
+// OR -> AND ( || AND )*
 // ---------------------------------------------------------------------------
 
-bool Parser::reconocerExpresion() {
-    if (!reconocerTermino()) {
+bool Parser::reconocerOr() {
+    if (!reconocerAnd()) {
         return false;
     }
-
-    while (comprobar(SUMA) || comprobar(RESTA) || comprobar(OR)) {
+    while (comprobar(OR)) {
         avanzar();
-        if (!reconocerTermino()) {
+        if (!reconocerAnd()) {
             return false;
         }
     }
@@ -739,17 +1148,16 @@ bool Parser::reconocerExpresion() {
 }
 
 // ---------------------------------------------------------------------------
-// TERMINO -> FACTOR ( (* | / | % | &&) FACTOR )*
+// AND -> REL ( && REL )*
 // ---------------------------------------------------------------------------
 
-bool Parser::reconocerTermino() {
-    if (!reconocerFactor()) {
+bool Parser::reconocerAnd() {
+    if (!reconocerRelacional()) {
         return false;
     }
-
-    while (comprobar(MULT) || comprobar(DIV) || comprobar(MOD) || comprobar(AND)) {
+    while (comprobar(AND)) {
         avanzar();
-        if (!reconocerFactor()) {
+        if (!reconocerRelacional()) {
             return false;
         }
     }
@@ -757,31 +1165,87 @@ bool Parser::reconocerTermino() {
 }
 
 // ---------------------------------------------------------------------------
-// FACTOR -> (- | !) FACTOR | NUM_INT | NUM_DEC | TEXTO | ID subindices
-//           | ( EXPRESION )
+// REL -> ADD ( COMP ADD )*
 // ---------------------------------------------------------------------------
 
-bool Parser::reconocerFactor() {
+bool Parser::reconocerRelacional() {
+    if (!reconocerAditivo()) {
+        return false;
+    }
+    while (comprobar(COMP)) {
+        avanzar();
+        if (!reconocerAditivo()) {
+            return false;
+        }
+    }
+    return true;
+}
+
+// ---------------------------------------------------------------------------
+// ADD -> MUL ( (+|-) MUL )*
+// ---------------------------------------------------------------------------
+
+bool Parser::reconocerAditivo() {
+    if (!reconocerMultiplicativo()) {
+        return false;
+    }
+    while (comprobar(SUMA) || comprobar(RESTA)) {
+        avanzar();
+        if (!reconocerMultiplicativo()) {
+            return false;
+        }
+    }
+    return true;
+}
+
+// ---------------------------------------------------------------------------
+// MUL -> UNARIO ( (*|/|%) UNARIO )*
+// ---------------------------------------------------------------------------
+
+bool Parser::reconocerMultiplicativo() {
+    if (!reconocerUnario()) {
+        return false;
+    }
+    while (comprobar(MULT) || comprobar(DIV) || comprobar(MOD)) {
+        avanzar();
+        if (!reconocerUnario()) {
+            return false;
+        }
+    }
+    return true;
+}
+
+// ---------------------------------------------------------------------------
+// UNARIO -> (-|!) UNARIO | PRIMARIO
+// ---------------------------------------------------------------------------
+
+bool Parser::reconocerUnario() {
     if (consumir(RESTA) || consumir(NOT)) {
-        return reconocerFactor();
+        return reconocerUnario();
     }
+    return reconocerPrimario();
+}
 
+// ---------------------------------------------------------------------------
+// PRIMARIO -> NUM_INT | NUM_DEC | TEXTO | func ID ( args )
+//           | ID subindices | ( COMPLEMENTO )
+// ---------------------------------------------------------------------------
+
+bool Parser::reconocerPrimario() {
     if (consumir(NUM_INT) || consumir(NUM_DEC) || consumir(TEXTO)) {
         return true;
     }
 
+    if (comprobar(FUNC)) {
+        return reconocerLlamada(false);
+    }
+
     if (comprobar(ID)) {
-        const Token identificador = actual();
+        nodo("ID: " + actual().lexema);
         avanzar();
-        if (tabla.buscar(identificador.lexema) == nullptr) {
-            advertencia(identificador.linea, identificador.columna,
-                        "la variable '" + identificador.lexema +
-                            "' se usa sin haber sido declarada",
-                        "Declárela antes de utilizarla en una expresión.");
-        }
         while (comprobar(CORCH_IZQ)) {
             avanzar();
-            if (!reconocerExpresion()) {
+            if (!reconocerComplemento()) {
                 return false;
             }
             if (!consumir(CORCH_DER)) {
@@ -793,7 +1257,7 @@ bool Parser::reconocerFactor() {
     }
 
     if (consumir(PAR_IZQ)) {
-        if (!reconocerExpresion()) {
+        if (!reconocerComplemento()) {
             return false;
         }
         if (!consumir(PAR_DER)) {
@@ -804,7 +1268,8 @@ bool Parser::reconocerFactor() {
         return true;
     }
 
-    errorActual("una expresión (número, texto, identificador o '(')", "COMPLEMENTO",
+    errorActual("una expresión (número, texto, identificador, func o '(')",
+                "COMPLEMENTO",
                 "Ejemplo: promedio = (nota1 + nota2) / 2;");
     return false;
 }

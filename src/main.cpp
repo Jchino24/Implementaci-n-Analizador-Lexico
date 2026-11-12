@@ -61,16 +61,10 @@ int columnaVisual(const std::string& linea, int columna) {
     return visual;
 }
 
-void imprimirError(const ErrorCompilacion& error, bool esAdvertencia,
+void imprimirError(const ErrorCompilacion& error,
                    const std::vector<std::string>& lineas) {
-    std::string etiqueta;
-    if (esAdvertencia) {
-        etiqueta = "[ADVERTENCIA]";
-    } else if (error.tipo == TipoError::LEXICO) {
-        etiqueta = "[ERROR LEXICO]";
-    } else {
-        etiqueta = "[ERROR SINTACTICO]";
-    }
+    const std::string etiqueta =
+        error.tipo == TipoError::LEXICO ? "[ERROR LEXICO]" : "[ERROR SINTACTICO]";
 
     std::cout << etiqueta << " Línea " << error.linea << ": " << error.mensaje
               << "\n";
@@ -239,22 +233,19 @@ int main(int argc, char* argv[]) {
     std::cout << kSubseparador << "\n";
 
     const std::vector<ErrorCompilacion>& errores = parser.obtenerErrores();
-    const std::vector<ErrorCompilacion>& advertencias =
-        parser.obtenerAdvertencias();
 
-    if (errores.empty() && advertencias.empty()) {
-        std::cout << "Sin errores ni advertencias.\n\n";
+    if (errores.empty()) {
+        std::cout << "Sin errores sintácticos.\n\n";
     } else {
         for (const ErrorCompilacion& error : errores) {
-            imprimirError(error, false, parser.obtenerLineas());
-        }
-        for (const ErrorCompilacion& aviso : advertencias) {
-            imprimirError(aviso, true, parser.obtenerLineas());
+            imprimirError(error, parser.obtenerLineas());
         }
     }
 
     std::cout << "RESULTADO\n";
     std::cout << kSubseparador << "\n";
+    std::cout << std::left << std::setw(32) << "Funciones reconocidas:"
+              << parser.totalFunciones() << "\n";
     std::cout << std::left << std::setw(32) << "Declaraciones reconocidas:"
               << parser.totalDeclaraciones() << "\n";
     std::cout << std::left << std::setw(32) << "Asignaciones reconocidas:"
@@ -263,8 +254,6 @@ int main(int argc, char* argv[]) {
               << parser.totalErroresLexicos() << "\n";
     std::cout << std::left << std::setw(32) << "Errores sintácticos:"
               << parser.totalErroresSintacticos() << "\n";
-    std::cout << std::left << std::setw(32) << "Advertencias:"
-              << advertencias.size() << "\n";
     std::cout << kSeparador << "\n";
 
     if (exito) {
