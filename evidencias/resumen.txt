@@ -1,6 +1,6 @@
 RESUMEN DE PRUEBAS - ANALIZADOR LP (PROYECTO INTEGRADOR)
 Generado por: pruebas/ejecutar_pruebas.sh
-Fecha: 2026-11-12 18:17:52
+Fecha: 2026-11-12 18:18:22
 ======================================================================
 OK       invalido_asignacion_sin_expresion.lp   esperado=1 obtenido=1 salida=evidencias/invalido_asignacion_sin_expresion.txt
 OK       invalido_caracter_no_reconocido.lp     esperado=1 obtenido=1 salida=evidencias/invalido_caracter_no_reconocido.txt
@@ -29,10 +29,11 @@ OK       valido_if_else.lp                      esperado=0 obtenido=0 salida=evi
 OK       valido_llamadas.lp                     esperado=0 obtenido=0 salida=evidencias/valido_llamadas.txt
 OK       valido_scanf.lp                        esperado=0 obtenido=0 salida=evidencias/valido_scanf.txt
 OK       valido_sin_variables.lp                esperado=0 obtenido=0 salida=evidencias/valido_sin_variables.txt
+OK       valido_void.lp                         esperado=0 obtenido=0 salida=evidencias/valido_void.txt
 OK       valido_while.lp                        esperado=0 obtenido=0 salida=evidencias/valido_while.txt
 ======================================================================
-Total de casos:  28
-Aprobados:       28
+Total de casos:  29
+Aprobados:       29
 Fallidos:        0
 Evidencias:      evidencias/
 ======================================================================

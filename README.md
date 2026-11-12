@@ -83,6 +83,7 @@ Notas:
 - `func` es una palabra reservada nueva del lexer, usada para llamar
   funciones: `func suma(2, 3);` o `x = func suma(2, 3);`.
 - `scanf` y `println` son comandos incorporados del lenguaje LP.
+- `f(void)` y `main(void)` se aceptan como listas de parámetros vacías.
 - No se reconoce `for`: la gramática de la especificación no lo incluye.
 
 ### Convenciones de tokens
@@ -118,7 +119,7 @@ no vuelve a analizar caracteres.
 │   ├── TablaSimbolos.h         # Registro de variables declaradas
 │   ├── Parser.h / Parser.cpp   # Analizador sintáctico recursivo descendente
 │   └── main.cpp                # CLI, reportes y códigos de salida
-├── casos_de_prueba/            # 11 programas válidos y 17 inválidos
+├── casos_de_prueba/            # 12 programas válidos y 17 inválidos
 ├── pruebas/
 │   └── ejecutar_pruebas.sh     # Ejecuta todos los casos y genera evidencias
 ├── evidencias/                 # Salidas completas de cada caso
@@ -362,6 +363,7 @@ Casos válidos incluidos:
 | `valido_arreglos.lp` | Arreglos y subíndices |
 | `valido_sin_variables.lp` | Bloque sin declaraciones |
 | `valido_scanf.lp` | `scanf` y `println` |
+| `valido_void.lp` | `f(void)` y `main(void)` |
 
 Los 17 casos inválidos cubren errores de puntuación, llaves, paréntesis,
 corchetes, declaraciones fuera de orden, funciones, llamadas y expresiones.
@@ -369,8 +371,8 @@ corchetes, declaraciones fuera de orden, funciones, llamadas y expresiones.
 Resultado de la última corrida:
 
 ```text
-Total de casos:  28
-Aprobados:       28
+Total de casos:  29
+Aprobados:       29
 Fallidos:        0
 ```
 

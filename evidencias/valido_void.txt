@@ -1,0 +1,112 @@
+==============================================================================
+ ANALIZADOR LÉXICO Y SINTÁCTICO - LENGUAJE LP
+ Proyecto integrador: parser con descenso recursivo
+==============================================================================
+Archivo: casos_de_prueba/valido_void.lp
+
+SECUENCIA DE TOKENS (ANÁLISIS LÉXICO)
+------------------------------------------------------------------------------
+#    LEXEMA                  TOKEN           LINEA
+------------------------------------------------------------------------------
+1    int                     INT             1
+2    constante               ID              1
+3    (                       (               1
+4    void                    VOID            1
+5    )                       )               1
+6    {                       {               1
+7    return                  RETURN          2
+8    42                      NUM_INT         2
+9    ;                       ;               2
+10   }                       }               3
+11   int                     INT             5
+12   main                    MAIN            5
+13   (                       (               5
+14   void                    VOID            5
+15   )                       )               5
+16   {                       {               5
+17   int                     INT             6
+18   x                       ID              6
+19   ;                       ;               6
+20   x                       ID              7
+21   =                       =               7
+22   func                    FUNC            7
+23   constante               ID              7
+24   (                       (               7
+25   )                       )               7
+26   ;                       ;               7
+27   println                 PRINTLN         8
+28   (                       (               8
+29   x                       ID              8
+30   )                       )               8
+31   ;                       ;               8
+32   }                       }               9
+------------------------------------------------------------------------------
+Total: 32 tokens
+
+TRAZA DE RECONOCIMIENTO SINTÁCTICO
+------------------------------------------------------------------------------
+PROGRAMA
+  LISTA_FUNCIONES
+    FUNCION
+      TIPO_RETORNO: int
+      ID: constante
+      PARAMETROS
+        PARAMETRO: void
+      BLOQUE
+        LISTA_VARIABLES
+        COMANDOS
+          RETURN
+            COMPLEMENTO
+              EXPRESION: 42
+            PUNTO_COMA: ;
+        BLOQUE: cierre '}' en la línea 3
+  PRINCIPAL
+    TIPO_RETORNO: int
+    PARAMETRO: void
+    main ( )
+    BLOQUE
+      LISTA_VARIABLES
+        DECLARACION
+          TIPO
+            TIPO_BASE: int
+          LISTA_VARIABLES
+            LISTA_ID
+              ID: x (int)
+            PUNTO_COMA: ;
+      COMANDOS
+        ASIGNACION
+          OBJETIVO: x
+          ASIGNACION: =
+          COMPLEMENTO
+            LLAMADA
+              ID: constante
+            EXPRESION: func constante ( )
+          PUNTO_COMA: ;
+        LLAMADA
+          ID: println
+          ARGUMENTOS
+            COMPLEMENTO
+              ID: x
+              EXPRESION: x
+          PUNTO_COMA: ;
+      BLOQUE: cierre '}' en la línea 9
+
+TABLA DE SÍMBOLOS (VARIABLES DECLARADAS)
+------------------------------------------------------------------------------
+#    NOMBRE              TIPO                LINEA
+------------------------------------------------------------------------------
+1    x                   int                 6
+
+DIAGNÓSTICO
+------------------------------------------------------------------------------
+Sin errores sintácticos.
+
+RESULTADO
+------------------------------------------------------------------------------
+Funciones reconocidas:          1
+Declaraciones reconocidas:      1
+Asignaciones reconocidas:       1
+Errores léxicos:               0
+Errores sintácticos:           0
+==============================================================================
+RESULTADO FINAL: PROGRAMA VÁLIDO

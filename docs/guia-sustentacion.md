@@ -167,7 +167,7 @@ Se reporta como token inesperado, porque la gramática de la especificación no
 incluye esa producción.
 
 **¿Cómo se prueba el sistema?**
-`./pruebas/ejecutar_pruebas.sh` compila, ejecuta los 28 casos, compara el
+`./pruebas/ejecutar_pruebas.sh` compila, ejecuta los 29 casos, compara el
 código de salida y el veredicto impreso, y guarda la salida completa en
 `evidencias/`.
 

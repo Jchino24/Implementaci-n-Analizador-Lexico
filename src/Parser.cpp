@@ -373,6 +373,11 @@ bool Parser::reconocerPrincipal() {
                     "La firma de main debe ser: main() { ... }");
         ok = false;
         consumir(PAR_DER);
+    } else if (comprobar(VOID) && siguienteEs(PAR_DER)) {
+        // main(void) equivale a main().
+        nodo("PARAMETRO: void");
+        avanzar();
+        consumir(PAR_DER);
     } else if (!consumir(PAR_DER)) {
         errorActual("')' para cerrar los parámetros de main", "PRINCIPAL",
                     "En esta etapa main() no recibe parámetros.");
@@ -901,6 +906,14 @@ bool Parser::reconocerListaParametros() {
     CierreNodo cierre{this};
 
     bool ok = true;
+
+    // f(void) equivale a una lista de parámetros vacía.
+    if (comprobar(VOID) && siguienteEs(PAR_DER)) {
+        nodo("PARAMETRO: void");
+        avanzar();
+        return true;
+    }
+
     while (true) {
         const InfoTipo tipo = reconocerTipo();
         if (!tipo.valido) {
