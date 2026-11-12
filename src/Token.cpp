@@ -19,6 +19,7 @@ std::string tokenTypeToString(TokenType tipo) {
         case SCANF:      return "SCANF";
         case PRINTLN:    return "PRINTLN";
         case MAIN:       return "MAIN";
+        case FUNC:       return "FUNC";
         case RETURN:     return "RETURN";
 
         case ASIGNACION: return "=";

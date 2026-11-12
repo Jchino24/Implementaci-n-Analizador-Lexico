@@ -23,6 +23,7 @@ enum TokenType {
     SCANF,
     PRINTLN,
     MAIN,
+    FUNC,
     RETURN,
 
     // Operadores

@@ -18,7 +18,7 @@ Lexer::Lexer(const std::string& rutaArchivo)
         {"boolean", BOOLEAN}, {"void", VOID},  {"if", IF},
         {"else", ELSE},     {"for", FOR},     {"while", WHILE},
         {"scanf", SCANF},   {"println", PRINTLN}, {"main", MAIN},
-        {"return", RETURN}};
+        {"func", FUNC},     {"return", RETURN}};
 
     avanzar();
 }
