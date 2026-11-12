@@ -1,0 +1,204 @@
+==============================================================================
+ ANALIZADOR LÉXICO Y SINTÁCTICO - LENGUAJE LP
+ Entregable 1: integración lexer + parser
+==============================================================================
+Archivo: /home/josfx/Documentos/deepseek-harness/default-workspace/analizador-lp/casos_de_prueba/valido_arreglos.lp
+
+SECUENCIA DE TOKENS (ANÁLISIS LÉXICO)
+------------------------------------------------------------------------------
+#    LEXEMA                  TOKEN           LINEA
+------------------------------------------------------------------------------
+1    void                    VOID            1
+2    main                    MAIN            1
+3    (                       (               1
+4    )                       )               1
+5    {                       {               1
+6    int                     INT             2
+7    notas                   ID              2
+8    [                       [               2
+9    5                       NUM_INT         2
+10   ]                       ]               2
+11   ;                       ;               2
+12   int                     INT             3
+13   matriz                  ID              3
+14   [                       [               3
+15   2                       NUM_INT         3
+16   ]                       ]               3
+17   [                       [               3
+18   2                       NUM_INT         3
+19   ]                       ]               3
+20   ;                       ;               3
+21   int                     INT             4
+22   i                       ID              4
+23   ;                       ;               4
+24   i                       ID              5
+25   =                       =               5
+26   0                       NUM_INT         5
+27   ;                       ;               5
+28   notas                   ID              6
+29   [                       [               6
+30   0                       NUM_INT         6
+31   ]                       ]               6
+32   =                       =               6
+33   18                      NUM_INT         6
+34   ;                       ;               6
+35   matriz                  ID              7
+36   [                       [               7
+37   1                       NUM_INT         7
+38   ]                       ]               7
+39   [                       [               7
+40   1                       NUM_INT         7
+41   ]                       ]               7
+42   =                       =               7
+43   20                      NUM_INT         7
+44   ;                       ;               7
+45   while                   WHILE           8
+46   (                       (               8
+47   i                       ID              8
+48   <                       COMP            8
+49   5                       NUM_INT         8
+50   )                       )               8
+51   {                       {               8
+52   notas                   ID              9
+53   [                       [               9
+54   i                       ID              9
+55   ]                       ]               9
+56   =                       =               9
+57   i                       ID              9
+58   *                       *               9
+59   2                       NUM_INT         9
+60   ;                       ;               9
+61   i                       ID              10
+62   =                       =               10
+63   i                       ID              10
+64   +                       +               10
+65   1                       NUM_INT         10
+66   ;                       ;               10
+67   }                       }               11
+68   println                 PRINTLN         12
+69   (                       (               12
+70   notas                   ID              12
+71   [                       [               12
+72   0                       NUM_INT         12
+73   ]                       ]               12
+74   )                       )               12
+75   ;                       ;               12
+76   }                       }               13
+------------------------------------------------------------------------------
+Total: 76 tokens
+
+TRAZA DE RECONOCIMIENTO SINTÁCTICO
+------------------------------------------------------------------------------
+PROGRAMA
+  LISTA_FUNCIONES
+  PRINCIPAL
+    TIPO_RETORNO: void
+    main ( )
+    BLOQUE
+      LISTA_VARIABLES
+        DECLARACION
+          TIPO
+            TIPO_BASE: int
+          LISTA_VARIABLES
+            LISTA_ID
+              DIMENSION: [5]
+              ID: notas (int[5])
+            PUNTO_COMA: ;
+        DECLARACION
+          TIPO
+            TIPO_BASE: int
+          LISTA_VARIABLES
+            LISTA_ID
+              DIMENSION: [2]
+              DIMENSION: [2]
+              ID: matriz (int[2][2])
+            PUNTO_COMA: ;
+        DECLARACION
+          TIPO
+            TIPO_BASE: int
+          LISTA_VARIABLES
+            LISTA_ID
+              ID: i (int)
+            PUNTO_COMA: ;
+      COMANDOS
+        ASIGNACION
+          OBJETIVO: i
+          ASIGNACION: =
+          COMPLEMENTO
+            EXPRESION: 0
+          PUNTO_COMA: ;
+        ASIGNACION
+          OBJETIVO: notas
+          COMPLEMENTO
+            EXPRESION: 0
+          ASIGNACION: =
+          COMPLEMENTO
+            EXPRESION: 18
+          PUNTO_COMA: ;
+        ASIGNACION
+          OBJETIVO: matriz
+          COMPLEMENTO
+            EXPRESION: 1
+          COMPLEMENTO
+            EXPRESION: 1
+          ASIGNACION: =
+          COMPLEMENTO
+            EXPRESION: 20
+          PUNTO_COMA: ;
+        WHILE
+          COMPLEMENTO
+            ID: i
+            EXPRESION: i < 5
+          BLOQUE
+            LISTA_VARIABLES
+            COMANDOS
+              ASIGNACION
+                OBJETIVO: notas
+                COMPLEMENTO
+                  ID: i
+                  EXPRESION: i
+                ASIGNACION: =
+                COMPLEMENTO
+                  ID: i
+                  EXPRESION: i * 2
+                PUNTO_COMA: ;
+              ASIGNACION
+                OBJETIVO: i
+                ASIGNACION: =
+                COMPLEMENTO
+                  ID: i
+                  EXPRESION: i + 1
+                PUNTO_COMA: ;
+            BLOQUE: cierre '}' en la línea 11
+        LLAMADA
+          ID: println
+          ARGUMENTOS
+            COMPLEMENTO
+              ID: notas
+              COMPLEMENTO
+                EXPRESION: 0
+              EXPRESION: notas [ 0 ]
+          PUNTO_COMA: ;
+      BLOQUE: cierre '}' en la línea 13
+
+TABLA DE SÍMBOLOS (VARIABLES DECLARADAS)
+------------------------------------------------------------------------------
+#    NOMBRE              TIPO                LINEA
+------------------------------------------------------------------------------
+1    notas               int[5]              2
+2    matriz              int[2][2]           3
+3    i                   int                 4
+
+DIAGNÓSTICO
+------------------------------------------------------------------------------
+Sin errores sintácticos.
+
+RESULTADO
+------------------------------------------------------------------------------
+Funciones reconocidas:          0
+Declaraciones reconocidas:      3
+Asignaciones reconocidas:       5
+Errores léxicos:               0
+Errores sintácticos:           0
+==============================================================================
+RESULTADO FINAL: PROGRAMA VÁLIDO

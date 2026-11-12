@@ -1,0 +1,119 @@
+==============================================================================
+ ANALIZADOR LÉXICO Y SINTÁCTICO - LENGUAJE LP
+ Entregable 1: integración lexer + parser
+==============================================================================
+Archivo: /home/josfx/Documentos/deepseek-harness/default-workspace/analizador-lp/casos_de_prueba/valido_scanf.lp
+
+SECUENCIA DE TOKENS (ANÁLISIS LÉXICO)
+------------------------------------------------------------------------------
+#    LEXEMA                  TOKEN           LINEA
+------------------------------------------------------------------------------
+1    void                    VOID            1
+2    main                    MAIN            1
+3    (                       (               1
+4    )                       )               1
+5    {                       {               1
+6    int                     INT             2
+7    edad                    ID              2
+8    ;                       ;               2
+9    float                   FLOAT           3
+10   nota                    ID              3
+11   ;                       ;               3
+12   scanf                   SCANF           4
+13   (                       (               4
+14   edad                    ID              4
+15   )                       )               4
+16   ;                       ;               4
+17   scanf                   SCANF           5
+18   (                       (               5
+19   nota                    ID              5
+20   )                       )               5
+21   ;                       ;               5
+22   println                 PRINTLN         6
+23   (                       (               6
+24   edad                    ID              6
+25   )                       )               6
+26   ;                       ;               6
+27   println                 PRINTLN         7
+28   (                       (               7
+29   nota                    ID              7
+30   )                       )               7
+31   ;                       ;               7
+32   }                       }               8
+------------------------------------------------------------------------------
+Total: 32 tokens
+
+TRAZA DE RECONOCIMIENTO SINTÁCTICO
+------------------------------------------------------------------------------
+PROGRAMA
+  LISTA_FUNCIONES
+  PRINCIPAL
+    TIPO_RETORNO: void
+    main ( )
+    BLOQUE
+      LISTA_VARIABLES
+        DECLARACION
+          TIPO
+            TIPO_BASE: int
+          LISTA_VARIABLES
+            LISTA_ID
+              ID: edad (int)
+            PUNTO_COMA: ;
+        DECLARACION
+          TIPO
+            TIPO_BASE: float
+          LISTA_VARIABLES
+            LISTA_ID
+              ID: nota (float)
+            PUNTO_COMA: ;
+      COMANDOS
+        LLAMADA
+          ID: scanf
+          ARGUMENTOS
+            COMPLEMENTO
+              ID: edad
+              EXPRESION: edad
+          PUNTO_COMA: ;
+        LLAMADA
+          ID: scanf
+          ARGUMENTOS
+            COMPLEMENTO
+              ID: nota
+              EXPRESION: nota
+          PUNTO_COMA: ;
+        LLAMADA
+          ID: println
+          ARGUMENTOS
+            COMPLEMENTO
+              ID: edad
+              EXPRESION: edad
+          PUNTO_COMA: ;
+        LLAMADA
+          ID: println
+          ARGUMENTOS
+            COMPLEMENTO
+              ID: nota
+              EXPRESION: nota
+          PUNTO_COMA: ;
+      BLOQUE: cierre '}' en la línea 8
+
+TABLA DE SÍMBOLOS (VARIABLES DECLARADAS)
+------------------------------------------------------------------------------
+#    NOMBRE              TIPO                LINEA
+------------------------------------------------------------------------------
+1    edad                int                 2
+2    nota                float               3
+
+DIAGNÓSTICO
+------------------------------------------------------------------------------
+Sin errores sintácticos.
+
+RESULTADO
+------------------------------------------------------------------------------
+Funciones reconocidas:          0
+Declaraciones reconocidas:      2
+Asignaciones reconocidas:       0
+Errores léxicos:               0
+Errores sintácticos:           0
+==============================================================================
+RESULTADO FINAL: PROGRAMA VÁLIDO

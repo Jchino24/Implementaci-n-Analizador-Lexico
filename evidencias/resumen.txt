@@ -1,19 +1,38 @@
 RESUMEN DE PRUEBAS - ANALIZADOR LP (ENTREGABLE 1)
 Generado por: pruebas/ejecutar_pruebas.sh
-Fecha: 2026-11-12 17:54:55
+Fecha: 2026-11-12 18:15:03
 ======================================================================
+OK       invalido_asignacion_sin_expresion.lp   esperado=1 obtenido=1 salida=evidencias/invalido_asignacion_sin_expresion.txt
 OK       invalido_caracter_no_reconocido.lp     esperado=1 obtenido=1 salida=evidencias/invalido_caracter_no_reconocido.txt
+OK       invalido_declaracion_despues_comando.lp esperado=1 obtenido=1 salida=evidencias/invalido_declaracion_despues_comando.txt
 OK       invalido_dimension_sin_cerrar.lp       esperado=1 obtenido=1 salida=evidencias/invalido_dimension_sin_cerrar.txt
+OK       invalido_else_sin_if.lp                esperado=1 obtenido=1 salida=evidencias/invalido_else_sin_if.txt
 OK       invalido_falta_igual.lp                esperado=1 obtenido=1 salida=evidencias/invalido_falta_igual.txt
 OK       invalido_falta_punto_coma.lp           esperado=1 obtenido=1 salida=evidencias/invalido_falta_punto_coma.txt
+OK       invalido_funcion_sin_parentesis.lp     esperado=1 obtenido=1 salida=evidencias/invalido_funcion_sin_parentesis.txt
+OK       invalido_func_sin_nombre.lp            esperado=1 obtenido=1 salida=evidencias/invalido_func_sin_nombre.txt
+OK       invalido_if_sin_bloque.lp              esperado=1 obtenido=1 salida=evidencias/invalido_if_sin_bloque.txt
+OK       invalido_if_sin_parentesis.lp          esperado=1 obtenido=1 salida=evidencias/invalido_if_sin_parentesis.txt
+OK       invalido_llamada_sin_func.lp           esperado=1 obtenido=1 salida=evidencias/invalido_llamada_sin_func.txt
+OK       invalido_llamada_sin_punto_coma.lp     esperado=1 obtenido=1 salida=evidencias/invalido_llamada_sin_punto_coma.txt
 OK       invalido_llave_sin_cerrar.lp           esperado=1 obtenido=1 salida=evidencias/invalido_llave_sin_cerrar.txt
 OK       invalido_parentesis_sin_cerrar.lp      esperado=1 obtenido=1 salida=evidencias/invalido_parentesis_sin_cerrar.txt
+OK       invalido_return_sin_punto_coma.lp      esperado=1 obtenido=1 salida=evidencias/invalido_return_sin_punto_coma.txt
 OK       invalido_token_inesperado.lp           esperado=1 obtenido=1 salida=evidencias/invalido_token_inesperado.txt
+OK       valido_anidado.lp                      esperado=0 obtenido=0 salida=evidencias/valido_anidado.txt
+OK       valido_arreglos.lp                     esperado=0 obtenido=0 salida=evidencias/valido_arreglos.txt
 OK       valido_basico.lp                       esperado=0 obtenido=0 salida=evidencias/valido_basico.txt
 OK       valido_completo.lp                     esperado=0 obtenido=0 salida=evidencias/valido_completo.txt
+OK       valido_expresiones.lp                  esperado=0 obtenido=0 salida=evidencias/valido_expresiones.txt
+OK       valido_funciones.lp                    esperado=0 obtenido=0 salida=evidencias/valido_funciones.txt
+OK       valido_if_else.lp                      esperado=0 obtenido=0 salida=evidencias/valido_if_else.txt
+OK       valido_llamadas.lp                     esperado=0 obtenido=0 salida=evidencias/valido_llamadas.txt
+OK       valido_scanf.lp                        esperado=0 obtenido=0 salida=evidencias/valido_scanf.txt
+OK       valido_sin_variables.lp                esperado=0 obtenido=0 salida=evidencias/valido_sin_variables.txt
+OK       valido_while.lp                        esperado=0 obtenido=0 salida=evidencias/valido_while.txt
 ======================================================================
-Total de casos:  9
-Aprobados:       9
+Total de casos:  28
+Aprobados:       28
 Fallidos:        0
 Evidencias:      evidencias/
 ======================================================================

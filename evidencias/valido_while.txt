@@ -1,0 +1,146 @@
+==============================================================================
+ ANALIZADOR LÉXICO Y SINTÁCTICO - LENGUAJE LP
+ Entregable 1: integración lexer + parser
+==============================================================================
+Archivo: /home/josfx/Documentos/deepseek-harness/default-workspace/analizador-lp/casos_de_prueba/valido_while.lp
+
+SECUENCIA DE TOKENS (ANÁLISIS LÉXICO)
+------------------------------------------------------------------------------
+#    LEXEMA                  TOKEN           LINEA
+------------------------------------------------------------------------------
+1    void                    VOID            1
+2    main                    MAIN            1
+3    (                       (               1
+4    )                       )               1
+5    {                       {               1
+6    int                     INT             2
+7    contador                ID              2
+8    ;                       ;               2
+9    int                     INT             3
+10   suma                    ID              3
+11   ;                       ;               3
+12   contador                ID              4
+13   =                       =               4
+14   0                       NUM_INT         4
+15   ;                       ;               4
+16   suma                    ID              5
+17   =                       =               5
+18   0                       NUM_INT         5
+19   ;                       ;               5
+20   while                   WHILE           6
+21   (                       (               6
+22   contador                ID              6
+23   <                       COMP            6
+24   10                      NUM_INT         6
+25   )                       )               6
+26   {                       {               6
+27   suma                    ID              7
+28   =                       =               7
+29   suma                    ID              7
+30   +                       +               7
+31   contador                ID              7
+32   ;                       ;               7
+33   contador                ID              8
+34   =                       =               8
+35   contador                ID              8
+36   +                       +               8
+37   1                       NUM_INT         8
+38   ;                       ;               8
+39   }                       }               9
+40   println                 PRINTLN         10
+41   (                       (               10
+42   suma                    ID              10
+43   )                       )               10
+44   ;                       ;               10
+45   }                       }               11
+------------------------------------------------------------------------------
+Total: 45 tokens
+
+TRAZA DE RECONOCIMIENTO SINTÁCTICO
+------------------------------------------------------------------------------
+PROGRAMA
+  LISTA_FUNCIONES
+  PRINCIPAL
+    TIPO_RETORNO: void
+    main ( )
+    BLOQUE
+      LISTA_VARIABLES
+        DECLARACION
+          TIPO
+            TIPO_BASE: int
+          LISTA_VARIABLES
+            LISTA_ID
+              ID: contador (int)
+            PUNTO_COMA: ;
+        DECLARACION
+          TIPO
+            TIPO_BASE: int
+          LISTA_VARIABLES
+            LISTA_ID
+              ID: suma (int)
+            PUNTO_COMA: ;
+      COMANDOS
+        ASIGNACION
+          OBJETIVO: contador
+          ASIGNACION: =
+          COMPLEMENTO
+            EXPRESION: 0
+          PUNTO_COMA: ;
+        ASIGNACION
+          OBJETIVO: suma
+          ASIGNACION: =
+          COMPLEMENTO
+            EXPRESION: 0
+          PUNTO_COMA: ;
+        WHILE
+          COMPLEMENTO
+            ID: contador
+            EXPRESION: contador < 10
+          BLOQUE
+            LISTA_VARIABLES
+            COMANDOS
+              ASIGNACION
+                OBJETIVO: suma
+                ASIGNACION: =
+                COMPLEMENTO
+                  ID: suma
+                  ID: contador
+                  EXPRESION: suma + contador
+                PUNTO_COMA: ;
+              ASIGNACION
+                OBJETIVO: contador
+                ASIGNACION: =
+                COMPLEMENTO
+                  ID: contador
+                  EXPRESION: contador + 1
+                PUNTO_COMA: ;
+            BLOQUE: cierre '}' en la línea 9
+        LLAMADA
+          ID: println
+          ARGUMENTOS
+            COMPLEMENTO
+              ID: suma
+              EXPRESION: suma
+          PUNTO_COMA: ;
+      BLOQUE: cierre '}' en la línea 11
+
+TABLA DE SÍMBOLOS (VARIABLES DECLARADAS)
+------------------------------------------------------------------------------
+#    NOMBRE              TIPO                LINEA
+------------------------------------------------------------------------------
+1    contador            int                 2
+2    suma                int                 3
+
+DIAGNÓSTICO
+------------------------------------------------------------------------------
+Sin errores sintácticos.
+
+RESULTADO
+------------------------------------------------------------------------------
+Funciones reconocidas:          0
+Declaraciones reconocidas:      2
+Asignaciones reconocidas:       4
+Errores léxicos:               0
+Errores sintácticos:           0
+==============================================================================
+RESULTADO FINAL: PROGRAMA VÁLIDO

@@ -1,0 +1,69 @@
+==============================================================================
+ ANALIZADOR LÉXICO Y SINTÁCTICO - LENGUAJE LP
+ Entregable 1: integración lexer + parser
+==============================================================================
+Archivo: /home/josfx/Documentos/deepseek-harness/default-workspace/analizador-lp/casos_de_prueba/invalido_else_sin_if.lp
+
+SECUENCIA DE TOKENS (ANÁLISIS LÉXICO)
+------------------------------------------------------------------------------
+#    LEXEMA                  TOKEN           LINEA
+------------------------------------------------------------------------------
+1    void                    VOID            1
+2    main                    MAIN            1
+3    (                       (               1
+4    )                       )               1
+5    {                       {               1
+6    else                    ELSE            2
+7    {                       {               2
+8    println                 PRINTLN         3
+9    (                       (               3
+10   x                       TEXTO           3
+11   )                       )               3
+12   ;                       ;               3
+13   }                       }               4
+14   }                       }               5
+------------------------------------------------------------------------------
+Total: 14 tokens
+
+TRAZA DE RECONOCIMIENTO SINTÁCTICO
+------------------------------------------------------------------------------
+PROGRAMA
+  LISTA_FUNCIONES
+  PRINCIPAL
+    TIPO_RETORNO: void
+    main ( )
+    BLOQUE
+      LISTA_VARIABLES
+      COMANDOS
+        BLOQUE
+          LISTA_VARIABLES
+          COMANDOS
+            LLAMADA
+              ID: println
+              ARGUMENTOS
+                COMPLEMENTO
+                  EXPRESION: x
+              PUNTO_COMA: ;
+          BLOQUE: cierre '}' en la línea 4
+      BLOQUE: cierre '}' en la línea 5
+
+TABLA DE SÍMBOLOS (VARIABLES DECLARADAS)
+------------------------------------------------------------------------------
+(no se registraron declaraciones)
+
+DIAGNÓSTICO
+------------------------------------------------------------------------------
+[ERROR SINTACTICO] Línea 2: token inesperado 'else' (ELSE); se esperaba una asignación, if, while, func, return, scanf o println
+      2 |     else {
+        |     ^
+        Sugerencia: Revise la línea o la instrucción anterior.
+
+RESULTADO
+------------------------------------------------------------------------------
+Funciones reconocidas:          0
+Declaraciones reconocidas:      0
+Asignaciones reconocidas:       0
+Errores léxicos:               0
+Errores sintácticos:           1
+==============================================================================
+RESULTADO FINAL: PROGRAMA CON ERRORES
