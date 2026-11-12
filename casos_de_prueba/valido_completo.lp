@@ -1,4 +1,4 @@
-// Entregable 1: declaraciones, arreglos, expresiones y comentarios.
+// Prueba integral: declaraciones, arreglos, expresiones y comentarios.
 void main() {
     int edad, contador;
     float promedio, nota1, nota2;
