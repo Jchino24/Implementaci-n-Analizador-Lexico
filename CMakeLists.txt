@@ -1,8 +1,18 @@
-cmake_minimum_required(VERSION 4.4)
-project(AnalizadorLexico)
+cmake_minimum_required(VERSION 3.16)
+project(AnalizadorLP LANGUAGES CXX)
 
-set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
 
-# Aquí le decimos que el ejecutable se llamará "analizador"
-# y que el código fuente está dentro de la carpeta src/
-add_executable(analizador src/main.cpp src/Lexer.cpp src/Token.cpp)
+# Ejecutable "analizador": integra lexer + parser.
+add_executable(analizador
+    src/main.cpp
+    src/Lexer.cpp
+    src/Token.cpp
+    src/Parser.cpp
+)
+
+if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+    target_compile_options(analizador PRIVATE -Wall -Wextra)
+endif()

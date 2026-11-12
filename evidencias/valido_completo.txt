@@ -1,0 +1,254 @@
+==============================================================================
+ ANALIZADOR LÉXICO Y SINTÁCTICO - LENGUAJE LP
+ Entregable 1: integración lexer + parser
+==============================================================================
+Archivo: /home/josfx/Documentos/deepseek-harness/default-workspace/analizador-lp/casos_de_prueba/valido_completo.lp
+
+SECUENCIA DE TOKENS (ANÁLISIS LÉXICO)
+------------------------------------------------------------------------------
+#    LEXEMA                  TOKEN           LINEA  COLUMNA
+------------------------------------------------------------------------------
+1    void                    VOID            2      1
+2    main                    MAIN            2      6
+3    (                       (               2      10
+4    )                       )               2      11
+5    {                       {               2      13
+6    int                     INT             3      5
+7    edad                    ID              3      9
+8    ,                       ,               3      13
+9    contador                ID              3      15
+10   ;                       ;               3      23
+11   float                   FLOAT           4      5
+12   promedio                ID              4      11
+13   ,                       ,               4      19
+14   nota1                   ID              4      21
+15   ,                       ,               4      26
+16   nota2                   ID              4      28
+17   ;                       ;               4      33
+18   char                    CHAR            5      5
+19   inicial                 ID              5      10
+20   ;                       ;               5      17
+21   boolean                 BOOLEAN         6      5
+22   aprobado                ID              6      13
+23   ;                       ;               6      21
+24   int                     INT             7      5
+25   notas                   ID              7      9
+26   [                       [               7      14
+27   10                      NUM_INT         7      15
+28   ]                       ]               7      17
+29   ;                       ;               7      18
+30   int                     INT             8      5
+31   matriz                  ID              8      9
+32   [                       [               8      15
+33   3                       NUM_INT         8      16
+34   ]                       ]               8      17
+35   [                       [               8      18
+36   3                       NUM_INT         8      19
+37   ]                       ]               8      20
+38   ;                       ;               8      21
+39   edad                    ID              10     5
+40   =                       =               10     10
+41   20                      NUM_INT         10     12
+42   ;                       ;               10     14
+43   contador                ID              11     5
+44   =                       =               11     14
+45   0                       NUM_INT         11     16
+46   ;                       ;               11     17
+47   nota1                   ID              12     5
+48   =                       =               12     11
+49   15.5                    NUM_DEC         12     13
+50   ;                       ;               12     17
+51   nota2                   ID              13     5
+52   =                       =               13     11
+53   12.25                   NUM_DEC         13     13
+54   ;                       ;               13     18
+55   promedio                ID              14     5
+56   =                       =               14     14
+57   (                       (               14     16
+58   nota1                   ID              14     17
+59   +                       +               14     23
+60   nota2                   ID              14     25
+61   )                       )               14     30
+62   /                       /               14     32
+63   2                       NUM_INT         14     34
+64   ;                       ;               14     35
+65   inicial                 ID              15     5
+66   =                       =               15     13
+67   A                       TEXTO           15     15
+68   ;                       ;               15     18
+69   aprobado                ID              16     5
+70   =                       =               16     14
+71   nota1                   ID              16     16
+72   >=                      COMP            16     22
+73   nota2                   ID              16     25
+74   ;                       ;               16     30
+75   notas                   ID              17     5
+76   [                       [               17     10
+77   0                       NUM_INT         17     11
+78   ]                       ]               17     12
+79   =                       =               17     14
+80   18                      NUM_INT         17     16
+81   ;                       ;               17     18
+82   matriz                  ID              18     5
+83   [                       [               18     11
+84   1                       NUM_INT         18     12
+85   ]                       ]               18     13
+86   [                       [               18     14
+87   2                       NUM_INT         18     15
+88   ]                       ]               18     16
+89   =                       =               18     18
+90   7                       NUM_INT         18     20
+91   ;                       ;               18     21
+92   contador                ID              19     5
+93   =                       =               19     14
+94   contador                ID              19     16
+95   +                       +               19     25
+96   1                       NUM_INT         19     27
+97   ;                       ;               19     28
+98   }                       }               20     1
+------------------------------------------------------------------------------
+Total: 98 tokens
+
+TRAZA DE RECONOCIMIENTO SINTÁCTICO
+------------------------------------------------------------------------------
+PROGRAMA
+  TIPO_RETORNO: void
+  PRINCIPAL
+  BLOQUE
+    DECLARACION
+      TIPO
+        TIPO_BASE: int
+      LISTA_VARIABLES
+        LISTA_ID
+          ID: edad (int)
+          ID: contador (int)
+        PUNTO_COMA: ;
+    DECLARACION
+      TIPO
+        TIPO_BASE: float
+      LISTA_VARIABLES
+        LISTA_ID
+          ID: promedio (float)
+          ID: nota1 (float)
+          ID: nota2 (float)
+        PUNTO_COMA: ;
+    DECLARACION
+      TIPO
+        TIPO_BASE: char
+      LISTA_VARIABLES
+        LISTA_ID
+          ID: inicial (char)
+        PUNTO_COMA: ;
+    DECLARACION
+      TIPO
+        TIPO_BASE: boolean
+      LISTA_VARIABLES
+        LISTA_ID
+          ID: aprobado (boolean)
+        PUNTO_COMA: ;
+    DECLARACION
+      TIPO
+        TIPO_BASE: int
+      LISTA_VARIABLES
+        LISTA_ID
+          DIMENSION: [10]
+          ID: notas (int[10])
+        PUNTO_COMA: ;
+    DECLARACION
+      TIPO
+        TIPO_BASE: int
+      LISTA_VARIABLES
+        LISTA_ID
+          DIMENSION: [3]
+          DIMENSION: [3]
+          ID: matriz (int[3][3])
+        PUNTO_COMA: ;
+    ASIGNACION
+      OBJETIVO: edad
+      ASIGNACION: =
+      COMPLEMENTO
+        EXPRESION: 20
+      PUNTO_COMA: ;
+    ASIGNACION
+      OBJETIVO: contador
+      ASIGNACION: =
+      COMPLEMENTO
+        EXPRESION: 0
+      PUNTO_COMA: ;
+    ASIGNACION
+      OBJETIVO: nota1
+      ASIGNACION: =
+      COMPLEMENTO
+        EXPRESION: 15.5
+      PUNTO_COMA: ;
+    ASIGNACION
+      OBJETIVO: nota2
+      ASIGNACION: =
+      COMPLEMENTO
+        EXPRESION: 12.25
+      PUNTO_COMA: ;
+    ASIGNACION
+      OBJETIVO: promedio
+      ASIGNACION: =
+      COMPLEMENTO
+        EXPRESION: ( nota1 + nota2 ) / 2
+      PUNTO_COMA: ;
+    ASIGNACION
+      OBJETIVO: inicial
+      ASIGNACION: =
+      COMPLEMENTO
+        EXPRESION: A
+      PUNTO_COMA: ;
+    ASIGNACION
+      OBJETIVO: aprobado
+      ASIGNACION: =
+      COMPLEMENTO
+        EXPRESION: nota1 >= nota2
+      PUNTO_COMA: ;
+    ASIGNACION
+      OBJETIVO: notas
+      ASIGNACION: =
+      COMPLEMENTO
+        EXPRESION: 18
+      PUNTO_COMA: ;
+    ASIGNACION
+      OBJETIVO: matriz
+      ASIGNACION: =
+      COMPLEMENTO
+        EXPRESION: 7
+      PUNTO_COMA: ;
+    ASIGNACION
+      OBJETIVO: contador
+      ASIGNACION: =
+      COMPLEMENTO
+        EXPRESION: contador + 1
+      PUNTO_COMA: ;
+    BLOQUE: cierre '}' en la línea 20
+
+TABLA DE SÍMBOLOS (VARIABLES DECLARADAS)
+------------------------------------------------------------------------------
+#    NOMBRE              TIPO                LINEA   COLUMNA
+------------------------------------------------------------------------------
+1    edad                int                 3       9
+2    contador            int                 3       15
+3    promedio            float               4       11
+4    nota1               float               4       21
+5    nota2               float               4       28
+6    inicial             char                5       10
+7    aprobado            boolean             6       13
+8    notas               int[10]             7       9
+9    matriz              int[3][3]           8       9
+
+DIAGNÓSTICO
+------------------------------------------------------------------------------
+Sin errores ni advertencias.
+
+RESULTADO
+------------------------------------------------------------------------------
+Declaraciones reconocidas:      6
+Asignaciones reconocidas:       10
+Errores léxicos:               0
+Errores sintácticos:           0
+Advertencias:                   0
+==============================================================================
+RESULTADO FINAL: PROGRAMA VÁLIDO

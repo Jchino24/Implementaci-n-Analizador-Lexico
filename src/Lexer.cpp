@@ -1,31 +1,24 @@
 #include "Lexer.h"
+
 #include <cctype>
 #include <iostream>
+#include <string>
 
-Lexer::Lexer(const std::string& rutaArchivo) {
+Lexer::Lexer(const std::string& rutaArchivo)
+    : currentChar(EOF), linea(1), columna(0) {
     archivo.open(rutaArchivo);
     if (!archivo.is_open()) {
         std::cerr << "Error al abrir el archivo: " << rutaArchivo << std::endl;
+        return;
     }
-    linea = 1;
-    columna = 0;
 
-    // Mapa directo de Palabras Reservadas -> Su Token según la tabla
+    // Mapa directo de palabras reservadas -> token.
     palabrasReservadas = {
-        {"int", INT},
-        {"float", FLOAT},
-        {"char", CHAR},
-        {"boolean", BOOLEAN},
-        {"void", VOID},
-        {"if", IF},
-        {"else", ELSE},
-        {"for", FOR},
-        {"while", WHILE},
-        {"scanf", SCANF},
-        {"println", PRINTLN},
-        {"main", MAIN},
-        {"return", RETURN}
-    };
+        {"int", INT},       {"float", FLOAT}, {"char", CHAR},
+        {"boolean", BOOLEAN}, {"void", VOID},  {"if", IF},
+        {"else", ELSE},     {"for", FOR},     {"while", WHILE},
+        {"scanf", SCANF},   {"println", PRINTLN}, {"main", MAIN},
+        {"return", RETURN}};
 
     avanzar();
 }
@@ -36,30 +29,46 @@ Lexer::~Lexer() {
     }
 }
 
+bool Lexer::estaAbierto() const {
+    return archivo.is_open();
+}
+
+const std::vector<ErrorLexico>& Lexer::obtenerErrores() const {
+    return errores;
+}
+
+void Lexer::registrarError(const std::string& mensaje, int lineaError,
+                           int columnaError) {
+    errores.push_back({lineaError, columnaError, mensaje});
+}
+
 void Lexer::avanzar() {
-    if (archivo.get(currentChar)) {
-        columna++;
-        if (currentChar == '\n') {
-            linea++;
-            columna = 0;
-        }
-    } else {
+    const int siguiente = archivo.get();
+    if (siguiente == EOF) {
         currentChar = EOF;
+        return;
+    }
+
+    currentChar = siguiente;
+    if (currentChar == '\n') {
+        ++linea;
+        columna = 0;
+    } else {
+        ++columna;
     }
 }
 
 void Lexer::saltarEspaciosYComentarios() {
     while (currentChar != EOF) {
-        if (isspace(currentChar)) {
+        if (std::isspace(static_cast<unsigned char>(currentChar))) {
             avanzar();
-        } 
-        // COMENT = //.*\n (Manejo de comentarios de una línea)
+        }
+        // COMENT = //.*\n (comentarios de una línea)
         else if (currentChar == '/' && archivo.peek() == '/') {
             while (currentChar != EOF && currentChar != '\n') {
                 avanzar();
             }
-        } 
-        else {
+        } else {
             break;
         }
     }
@@ -72,122 +81,129 @@ Token Lexer::getNextToken() {
         return {FIN_ARCHIVO, "", linea, columna};
     }
 
-    int colInicio = columna;
+    const int colInicio = columna;
+    const int lineaInicio = linea;
 
-    // 1. Identificadores (ID) y Palabras Reservadas
-    // <--- CAMBIO REALIZADO: Se agregó '|| currentChar == '$'' para reconocer variables como $precio --->
-    if (isalpha(currentChar) || currentChar == '_' || currentChar == '$') {
-        std::string lexema = "";
-        while (isalnum(currentChar) || currentChar == '_' || currentChar == '$') {
-            lexema += currentChar;
+    // 1. Identificadores (ID) y palabras reservadas.
+    if (std::isalpha(static_cast<unsigned char>(currentChar)) || currentChar == '_' || currentChar == '$') {
+        std::string lexema;
+        while (std::isalnum(static_cast<unsigned char>(currentChar)) || currentChar == '_' ||
+               currentChar == '$') {
+            lexema += static_cast<char>(currentChar);
             avanzar();
         }
 
-        auto it = palabrasReservadas.find(lexema);
-        if (it != palabrasReservadas.end()) {
-            return {it->second, lexema, linea, colInicio};
+        const auto encontrada = palabrasReservadas.find(lexema);
+        if (encontrada != palabrasReservadas.end()) {
+            return {encontrada->second, lexema, lineaInicio, colInicio};
         }
-        return {ID, lexema, linea, colInicio};
+        return {ID, lexema, lineaInicio, colInicio};
     }
 
-    // 2. Constantes de texto ("...")
+    // 2. Constantes de texto ("...").
     if (currentChar == '"') {
-        std::string lexema = "";
-        avanzar(); // Consumir comilla de apertura
-        
-        // Se añade '&& currentChar != '\n'' para detener la lectura al acabar la línea
+        std::string lexema;
+        avanzar();  // Consumir la comilla de apertura.
+
         while (currentChar != EOF && currentChar != '"' && currentChar != '\n') {
-            lexema += currentChar;
+            lexema += static_cast<char>(currentChar);
             avanzar();
         }
+
         if (currentChar == '"') {
-            avanzar(); // Consumir comilla de cierre
-            return {TEXTO, lexema, linea, colInicio};
+            avanzar();  // Consumir la comilla de cierre.
+            return {TEXTO, lexema, lineaInicio, colInicio};
         }
-        // Si termina la línea o el archivo sin cerrar comilla, reporta DESCONOCIDO solo para esa línea
-        return {DESCONOCIDO, lexema, linea, colInicio};
+
+        registrarError("constante de texto sin comilla de cierre", lineaInicio,
+                       colInicio);
+        return {DESCONOCIDO, lexema, lineaInicio, colInicio};
     }
 
-    // 3. Números Enteros y Decimales
-    if (isdigit(currentChar)) {
-        std::string lexema = "";
+    // 3. Números enteros y decimales.
+    if (std::isdigit(static_cast<unsigned char>(currentChar))) {
+        std::string lexema;
         bool esDecimal = false;
 
-        while (isdigit(currentChar)) {
-            lexema += currentChar;
+        while (std::isdigit(static_cast<unsigned char>(currentChar))) {
+            lexema += static_cast<char>(currentChar);
             avanzar();
         }
 
         if (currentChar == '.') {
-            char nextChar = archivo.peek();
-            if (isdigit(nextChar)) {
+            const int siguiente = archivo.peek();
+            if (siguiente != EOF && std::isdigit(static_cast<unsigned char>(siguiente))) {
                 esDecimal = true;
-                lexema += currentChar;
+                lexema += static_cast<char>(currentChar);
                 avanzar();
-                while (isdigit(currentChar)) {
-                    lexema += currentChar;
+                while (std::isdigit(static_cast<unsigned char>(currentChar))) {
+                    lexema += static_cast<char>(currentChar);
                     avanzar();
                 }
             }
         }
 
-        return {esDecimal ? NUM_DEC : NUM_INT, lexema, linea, colInicio};
+        return {esDecimal ? NUM_DEC : NUM_INT, lexema, lineaInicio, colInicio};
     }
 
-    // 4. Operadores de Comparación (COMP)
-    if (currentChar == '<' || currentChar == '>' || currentChar == '!' || currentChar == '=') {
-        std::string lexema = "";
-        lexema += currentChar;
-        char opInicial = currentChar;
+    // 4. Operadores relacionales y de asignación.
+    if (currentChar == '<' || currentChar == '>' || currentChar == '!' ||
+        currentChar == '=') {
+        std::string lexema;
+        lexema += static_cast<char>(currentChar);
+        const char opInicial = static_cast<char>(currentChar);
         avanzar();
 
-        if (currentChar == '=') { // <=, >=, !=, ==
-            lexema += currentChar;
+        if (currentChar == '=') {  // <=, >=, !=, ==
+            lexema += static_cast<char>(currentChar);
             avanzar();
-            return {COMP, lexema, linea, colInicio};
+            return {COMP, lexema, lineaInicio, colInicio};
         }
 
         if (opInicial == '<' || opInicial == '>') {
-            return {COMP, lexema, linea, colInicio}; // < o > son COMP
+            return {COMP, lexema, lineaInicio, colInicio};
         }
-
         if (opInicial == '=') {
-            return {ASIGNACION, lexema, linea, colInicio}; // = solo es Asignación
+            return {ASIGNACION, lexema, lineaInicio, colInicio};
         }
-
-        if (opInicial == '!') {
-            return {NOT, lexema, linea, colInicio}; // ! solo es NOT
-        }
+        // opInicial == '!'
+        return {NOT, lexema, lineaInicio, colInicio};
     }
 
-    // 5. Operadores Lógicos (&&, ||)
+    // 5. Operadores lógicos (&&, ||).
     if (currentChar == '&' && archivo.peek() == '&') {
-        avanzar(); avanzar();
-        return {AND, "&&", linea, colInicio};
+        avanzar();
+        avanzar();
+        return {AND, "&&", lineaInicio, colInicio};
     }
     if (currentChar == '|' && archivo.peek() == '|') {
-        avanzar(); avanzar();
-        return {OR, "||", linea, colInicio};
+        avanzar();
+        avanzar();
+        return {OR, "||", lineaInicio, colInicio};
     }
 
-    // 6. Operadores Aritméticos y Símbolos Especiales simples
-    char c = currentChar;
+    // 6. Operadores aritméticos y símbolos especiales simples.
+    const char c = static_cast<char>(currentChar);
+    const int lineaToken = linea;
     avanzar();
     switch (c) {
-        case '+': return {SUMA, "+", linea, colInicio};
-        case '-': return {RESTA, "-", linea, colInicio};
-        case '*': return {MULT, "*", linea, colInicio};
-        case '/': return {DIV, "/", linea, colInicio};
-        case '%': return {MOD, "%", linea, colInicio};
-        case '(': return {PAR_IZQ, "(", linea, colInicio};
-        case ')': return {PAR_DER, ")", linea, colInicio};
-        case '[': return {CORCH_IZQ, "[", linea, colInicio};
-        case ']': return {CORCH_DER, "]", linea, colInicio};
-        case '{': return {LLAVE_IZQ, "{", linea, colInicio};
-        case '}': return {LLAVE_DER, "}", linea, colInicio};
-        case ',': return {COMA, ",", linea, colInicio};
-        case ';': return {PUNTO_COMA, ";", linea, colInicio};
-        case '.': return {PUNTO, ".", linea, colInicio}; // <--- CAMBIO REALIZADO: Reconocimiento del símbolo '.'
-        default:  return {DESCONOCIDO, std::string(1, c), linea, colInicio};
+        case '+': return {SUMA, "+", lineaToken, colInicio};
+        case '-': return {RESTA, "-", lineaToken, colInicio};
+        case '*': return {MULT, "*", lineaToken, colInicio};
+        case '/': return {DIV, "/", lineaToken, colInicio};
+        case '%': return {MOD, "%", lineaToken, colInicio};
+        case '(': return {PAR_IZQ, "(", lineaToken, colInicio};
+        case ')': return {PAR_DER, ")", lineaToken, colInicio};
+        case '[': return {CORCH_IZQ, "[", lineaToken, colInicio};
+        case ']': return {CORCH_DER, "]", lineaToken, colInicio};
+        case '{': return {LLAVE_IZQ, "{", lineaToken, colInicio};
+        case '}': return {LLAVE_DER, "}", lineaToken, colInicio};
+        case ',': return {COMA, ",", lineaToken, colInicio};
+        case ';': return {PUNTO_COMA, ";", lineaToken, colInicio};
+        case '.': return {PUNTO, ".", lineaToken, colInicio};
+        default:
+            registrarError("carácter no reconocido '" + std::string(1, c) + "'",
+                           lineaToken, colInicio);
+            return {DESCONOCIDO, std::string(1, c), lineaToken, colInicio};
     }
 }

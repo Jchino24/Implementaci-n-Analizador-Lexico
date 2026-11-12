@@ -1,0 +1,69 @@
+==============================================================================
+ ANALIZADOR LÉXICO Y SINTÁCTICO - LENGUAJE LP
+ Entregable 1: integración lexer + parser
+==============================================================================
+Archivo: /home/josfx/Documentos/deepseek-harness/default-workspace/analizador-lp/casos_de_prueba/invalido_caracter_no_reconocido.lp
+
+SECUENCIA DE TOKENS (ANÁLISIS LÉXICO)
+------------------------------------------------------------------------------
+#    LEXEMA                  TOKEN           LINEA  COLUMNA
+------------------------------------------------------------------------------
+1    void                    VOID            1      1
+2    main                    MAIN            1      6
+3    (                       (               1      10
+4    )                       )               1      11
+5    {                       {               1      13
+6    int                     INT             2      5
+7    edad                    ID              2      9
+8    ;                       ;               2      13
+9    edad                    ID              3      5
+10   =                       =               3      10
+11   20                      NUM_INT         3      12
+12   ;                       ;               3      14
+13   @                       DESCONOCIDO     4      5
+14   }                       }               5      1
+------------------------------------------------------------------------------
+Total: 14 tokens
+
+TRAZA DE RECONOCIMIENTO SINTÁCTICO
+------------------------------------------------------------------------------
+PROGRAMA
+  TIPO_RETORNO: void
+  PRINCIPAL
+  BLOQUE
+    DECLARACION
+      TIPO
+        TIPO_BASE: int
+      LISTA_VARIABLES
+        LISTA_ID
+          ID: edad (int)
+        PUNTO_COMA: ;
+    ASIGNACION
+      OBJETIVO: edad
+      ASIGNACION: =
+      COMPLEMENTO
+        EXPRESION: 20
+      PUNTO_COMA: ;
+    BLOQUE: cierre '}' en la línea 5
+
+TABLA DE SÍMBOLOS (VARIABLES DECLARADAS)
+------------------------------------------------------------------------------
+#    NOMBRE              TIPO                LINEA   COLUMNA
+------------------------------------------------------------------------------
+1    edad                int                 2       9
+
+DIAGNÓSTICO
+------------------------------------------------------------------------------
+[ERROR LEXICO] Línea 4, columna 5: carácter no reconocido '@'
+      4 |     @
+        |     ^
+
+RESULTADO
+------------------------------------------------------------------------------
+Declaraciones reconocidas:      1
+Asignaciones reconocidas:       1
+Errores léxicos:               1
+Errores sintácticos:           0
+Advertencias:                   0
+==============================================================================
+RESULTADO FINAL: PROGRAMA CON ERRORES

@@ -1,0 +1,67 @@
+==============================================================================
+ ANALIZADOR LÉXICO Y SINTÁCTICO - LENGUAJE LP
+ Entregable 1: integración lexer + parser
+==============================================================================
+Archivo: /home/josfx/Documentos/deepseek-harness/default-workspace/analizador-lp/casos_de_prueba/invalido_falta_punto_coma.lp
+
+SECUENCIA DE TOKENS (ANÁLISIS LÉXICO)
+------------------------------------------------------------------------------
+#    LEXEMA                  TOKEN           LINEA  COLUMNA
+------------------------------------------------------------------------------
+1    void                    VOID            1      1
+2    main                    MAIN            1      6
+3    (                       (               1      10
+4    )                       )               1      11
+5    {                       {               1      13
+6    int                     INT             2      5
+7    edad                    ID              2      9
+8    edad                    ID              3      5
+9    =                       =               3      10
+10   20                      NUM_INT         3      12
+11   ;                       ;               3      14
+12   }                       }               4      1
+------------------------------------------------------------------------------
+Total: 12 tokens
+
+TRAZA DE RECONOCIMIENTO SINTÁCTICO
+------------------------------------------------------------------------------
+PROGRAMA
+  TIPO_RETORNO: void
+  PRINCIPAL
+  BLOQUE
+    DECLARACION
+      TIPO
+        TIPO_BASE: int
+      LISTA_VARIABLES
+        LISTA_ID
+          ID: edad (int)
+    ASIGNACION
+      OBJETIVO: edad
+      ASIGNACION: =
+      COMPLEMENTO
+        EXPRESION: 20
+      PUNTO_COMA: ;
+    BLOQUE: cierre '}' en la línea 4
+
+TABLA DE SÍMBOLOS (VARIABLES DECLARADAS)
+------------------------------------------------------------------------------
+#    NOMBRE              TIPO                LINEA   COLUMNA
+------------------------------------------------------------------------------
+1    edad                int                 2       9
+
+DIAGNÓSTICO
+------------------------------------------------------------------------------
+[ERROR SINTACTICO] Línea 3, columna 5: se esperaba ';' al final de la declaración (LISTA_VARIABLES), pero se encontró 'edad' (ID)
+      3 |     edad = 20;
+        |     ^
+        Sugerencia: Falta ';' al final de la sentencia de la línea 2.
+
+RESULTADO
+------------------------------------------------------------------------------
+Declaraciones reconocidas:      1
+Asignaciones reconocidas:       1
+Errores léxicos:               0
+Errores sintácticos:           1
+Advertencias:                   0
+==============================================================================
+RESULTADO FINAL: PROGRAMA CON ERRORES

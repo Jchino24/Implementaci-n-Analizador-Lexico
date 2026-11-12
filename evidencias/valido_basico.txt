@@ -1,0 +1,87 @@
+==============================================================================
+ ANALIZADOR LÉXICO Y SINTÁCTICO - LENGUAJE LP
+ Entregable 1: integración lexer + parser
+==============================================================================
+Archivo: /home/josfx/Documentos/deepseek-harness/default-workspace/analizador-lp/casos_de_prueba/valido_basico.lp
+
+SECUENCIA DE TOKENS (ANÁLISIS LÉXICO)
+------------------------------------------------------------------------------
+#    LEXEMA                  TOKEN           LINEA  COLUMNA
+------------------------------------------------------------------------------
+1    void                    VOID            1      1
+2    main                    MAIN            1      6
+3    (                       (               1      10
+4    )                       )               1      11
+5    {                       {               1      13
+6    int                     INT             2      5
+7    edad                    ID              2      9
+8    ;                       ;               2      13
+9    float                   FLOAT           3      5
+10   promedio                ID              3      11
+11   ;                       ;               3      19
+12   edad                    ID              4      5
+13   =                       =               4      10
+14   20                      NUM_INT         4      12
+15   ;                       ;               4      14
+16   promedio                ID              5      5
+17   =                       =               5      14
+18   15.5                    NUM_DEC         5      16
+19   ;                       ;               5      20
+20   }                       }               6      1
+------------------------------------------------------------------------------
+Total: 20 tokens
+
+TRAZA DE RECONOCIMIENTO SINTÁCTICO
+------------------------------------------------------------------------------
+PROGRAMA
+  TIPO_RETORNO: void
+  PRINCIPAL
+  BLOQUE
+    DECLARACION
+      TIPO
+        TIPO_BASE: int
+      LISTA_VARIABLES
+        LISTA_ID
+          ID: edad (int)
+        PUNTO_COMA: ;
+    DECLARACION
+      TIPO
+        TIPO_BASE: float
+      LISTA_VARIABLES
+        LISTA_ID
+          ID: promedio (float)
+        PUNTO_COMA: ;
+    ASIGNACION
+      OBJETIVO: edad
+      ASIGNACION: =
+      COMPLEMENTO
+        EXPRESION: 20
+      PUNTO_COMA: ;
+    ASIGNACION
+      OBJETIVO: promedio
+      ASIGNACION: =
+      COMPLEMENTO
+        EXPRESION: 15.5
+      PUNTO_COMA: ;
+    BLOQUE: cierre '}' en la línea 6
+
+TABLA DE SÍMBOLOS (VARIABLES DECLARADAS)
+------------------------------------------------------------------------------
+#    NOMBRE              TIPO                LINEA   COLUMNA
+------------------------------------------------------------------------------
+1    edad                int                 2       9
+2    promedio            float               3       11
+
+DIAGNÓSTICO
+------------------------------------------------------------------------------
+Sin errores ni advertencias.
+
+RESULTADO
+------------------------------------------------------------------------------
+Declaraciones reconocidas:      2
+Asignaciones reconocidas:       2
+Errores léxicos:               0
+Errores sintácticos:           0
+Advertencias:                   0
+==============================================================================
+RESULTADO FINAL: PROGRAMA VÁLIDO

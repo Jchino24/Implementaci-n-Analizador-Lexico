@@ -46,7 +46,7 @@ enum TokenType {
     LLAVE_DER,    // }
     COMA,         // ,
     PUNTO_COMA,   // ;
-    PUNTO,        // . <--- CAMBIO REALIZADO: Nuevo enum para el punto '.'
+    PUNTO,        // .
 
     DESCONOCIDO,
     FIN_ARCHIVO

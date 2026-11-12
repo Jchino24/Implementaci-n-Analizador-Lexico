@@ -1,0 +1,19 @@
+RESUMEN DE PRUEBAS - ANALIZADOR LP (ENTREGABLE 1)
+Generado por: pruebas/ejecutar_pruebas.sh
+Fecha: 2026-11-12 17:54:55
+======================================================================
+OK       invalido_caracter_no_reconocido.lp     esperado=1 obtenido=1 salida=evidencias/invalido_caracter_no_reconocido.txt
+OK       invalido_dimension_sin_cerrar.lp       esperado=1 obtenido=1 salida=evidencias/invalido_dimension_sin_cerrar.txt
+OK       invalido_falta_igual.lp                esperado=1 obtenido=1 salida=evidencias/invalido_falta_igual.txt
+OK       invalido_falta_punto_coma.lp           esperado=1 obtenido=1 salida=evidencias/invalido_falta_punto_coma.txt
+OK       invalido_llave_sin_cerrar.lp           esperado=1 obtenido=1 salida=evidencias/invalido_llave_sin_cerrar.txt
+OK       invalido_parentesis_sin_cerrar.lp      esperado=1 obtenido=1 salida=evidencias/invalido_parentesis_sin_cerrar.txt
+OK       invalido_token_inesperado.lp           esperado=1 obtenido=1 salida=evidencias/invalido_token_inesperado.txt
+OK       valido_basico.lp                       esperado=0 obtenido=0 salida=evidencias/valido_basico.txt
+OK       valido_completo.lp                     esperado=0 obtenido=0 salida=evidencias/valido_completo.txt
+======================================================================
+Total de casos:  9
+Aprobados:       9
+Fallidos:        0
+Evidencias:      evidencias/
+======================================================================
