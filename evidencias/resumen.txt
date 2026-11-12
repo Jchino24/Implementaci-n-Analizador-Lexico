@@ -1,6 +1,6 @@
 RESUMEN DE PRUEBAS - ANALIZADOR LP (ENTREGABLE 1)
 Generado por: pruebas/ejecutar_pruebas.sh
-Fecha: 2026-11-12 18:15:03
+Fecha: 2026-11-12 18:17:19
 ======================================================================
 OK       invalido_asignacion_sin_expresion.lp   esperado=1 obtenido=1 salida=evidencias/invalido_asignacion_sin_expresion.txt
 OK       invalido_caracter_no_reconocido.lp     esperado=1 obtenido=1 salida=evidencias/invalido_caracter_no_reconocido.txt

@@ -1,70 +1,107 @@
 # Analizador Léxico y Sintáctico del Lenguaje LP
 
-**Entregable 1 – Implementación inicial (30%)**
-
-Fecha de entrega: 13 de noviembre.
+**Proyecto integrador – Análisis sintáctico para LP**
 
 Integrantes:
 
 - Jose David Choquehuanca Calcina
 - Jose Carlos Chino Nina
 
-Proyecto C++17 que integra el **analizador léxico** existente con un
+Proyecto C++17 que reutiliza el **analizador léxico** de LP y agrega un
 **analizador sintáctico recursivo descendente**. El programa lee un archivo
-`.lp`, muestra su secuencia de tokens, reconoce la estructura de un programa LP
-y reporta los errores sintácticos con línea, columna, fragmento de código y una
-sugerencia de corrección.
+`.lp`, muestra su secuencia de tokens, reconoce programas con funciones,
+`main()`, bloques, declaraciones, asignaciones, `if/else`, `while` y llamadas a
+función, y reporta los errores con línea, fragmento de código y sugerencia.
 
 ---
 
-## 1. Funcionalidades del entregable
+## 1. Alcance implementado
 
-| Requisito | Dónde se implementa | Cómo se evidencia |
-|---|---|---|
-| Integración con el lexer | `Parser::Parser` recorre `Lexer::getNextToken()` y construye la secuencia de tokens | Tabla **SECUENCIA DE TOKENS** |
-| Reconocimiento de `PROGRAMA` y `PRINCIPAL` | `Parser::reconocerPrograma`, `Parser::reconocerPrincipal` | Nodos `PROGRAMA` y `PRINCIPAL` de la traza |
-| Reconocimiento de `BLOQUE` | `Parser::reconocerBloque` | Nodo `BLOQUE` y cierre `}` |
-| `TIPO`, `TIPO_BASE`, `DIMENSION` | `Parser::reconocerTipo`, `reconocerTipoBase`, `reconocerDimension` | Nodos `TIPO`, `TIPO_BASE`, `DIMENSION` |
-| `LISTA_VARIABLES` y `LISTA_ID` | `Parser::reconocerListaVariables`, `reconocerListaId` | Nodos homónimos y tabla de símbolos |
-| `ASIGNACION` y `COMPLEMENTO` | `Parser::reconocerAsignacion`, `reconocerComplemento` | Nodos homónimos y expresión reconocida |
-| Errores sintácticos básicos | `errorPuntoComa`, `errorActual`, `sincronizar` | Sección **DIAGNÓSTICO** |
-| Tabla de símbolos (valor agregado) | `TablaSimbolos`, llenada en `reconocerListaId` | Tabla **TABLA DE SÍMBOLOS** |
+| Requisito de la especificación | Implementación |
+|---|---|
+| Reutilizar el lexer, sin analizar caracteres desde el parser | `Parser` consume exclusivamente `Lexer::getNextToken()` |
+| Consumir la secuencia de tokens | `Parser` guarda los tokens en `flujo` y avanza con `avanzar()` |
+| Descenso recursivo por no terminal | Una función por producción: `reconocerPrograma`, `reconocerFuncion`, `reconocerIf`, etc. |
+| Distinguir aceptación de errores | `analizar()` devuelve `true/false`; el proceso sale con `0`, `1` o `2` |
+| Separar análisis sintáctico del semántico | No se valida uso, declaración ni compatibilidad de tipos |
+| Código modular y comentado | `Lexer`, `Parser`, `TablaSimbolos`, `Token` y `main` separados |
+| `PROGRAMA -> LISTA_FUNCIONES PRINCIPAL` | `reconocerListaFunciones` y `reconocerPrincipal` |
+| `BLOQUE -> { LISTA_VARIABLES COMANDOS }` | `reconocerBloque` exige declaraciones antes de comandos |
+| `if/else` y `while` | `reconocerIf` y `reconocerWhile` |
+| Llamada con el terminal `func` | `FUNC` agregado al lexer y usado por `reconocerLlamada` |
+| Precedencia de expresiones | `||`, `&&`, relacionales, aditivos y multiplicativos |
+| Sin producción de `for` | `for` no se reconoce como comando |
 
 ---
 
 ## 2. Gramática implementada
 
 ```bnf
-PROGRAMA         -> TIPO_RETORNO PRINCIPAL BLOQUE
-TIPO_RETORNO     -> void | int | float | char | boolean
-PRINCIPAL        -> main ( )
-BLOQUE           -> { LISTA_SENTENCIAS }
-LISTA_SENTENCIAS -> ( DECLARACION | ASIGNACION )*
-DECLARACION      -> TIPO LISTA_VARIABLES
+PROGRAMA         -> LISTA_FUNCIONES PRINCIPAL
+LISTA_FUNCIONES  -> FUNCION*
+FUNCION          -> TIPO_RETORNO ID ( LISTA_PARAMETROS ) BLOQUE
+TIPO_RETORNO     -> void | TIPO_BASE
+PRINCIPAL        -> [TIPO_RETORNO] main ( ) BLOQUE
+BLOQUE           -> { LISTA_VARIABLES COMANDOS }
+LISTA_VARIABLES  -> (TIPO LISTA_ID ;)*
+COMANDOS         -> COMANDO*
+COMANDO          -> ASIGNACION | IF | WHILE | LLAMADA | RETURN
+                  | SCANF | PRINTLN
 TIPO             -> TIPO_BASE DIMENSION*
 TIPO_BASE        -> int | float | char | boolean
 DIMENSION        -> [ NUM_INT ]
-LISTA_VARIABLES  -> LISTA_ID ;
 LISTA_ID         -> ID DIMENSION* ( , ID DIMENSION* )*
 ASIGNACION       -> ID ( [ COMPLEMENTO ] )* = COMPLEMENTO ;
-COMPLEMENTO      -> EXPRESION ( COMP EXPRESION )*
-EXPRESION        -> TERMINO ( ( + | - | || ) TERMINO )*
-TERMINO          -> FACTOR ( ( * | / | % | && ) FACTOR )*
-FACTOR           -> ( - | ! ) FACTOR
-                  | NUM_INT | NUM_DEC | TEXTO
+IF               -> if ( COMPLEMENTO ) BLOQUE [ else ( IF | BLOQUE ) ]
+WHILE            -> while ( COMPLEMENTO ) BLOQUE
+LLAMADA          -> func ID ( LISTA_ARGUMENTOS ) [ ; ]
+RETURN           -> return [ COMPLEMENTO ] ;
+SCANF/PRINTLN    -> (scanf|println) ( LISTA_ARGUMENTOS ) ;
+LISTA_PARAMETROS -> [ TIPO ID (DIMENSION*) ( , ... )* ]
+LISTA_ARGUMENTOS -> [ COMPLEMENTO ( , COMPLEMENTO )* ]
+COMPLEMENTO      -> OR
+OR               -> AND ( || AND )*
+AND              -> REL ( && REL )*
+REL              -> ADD ( COMP ADD )*
+ADD              -> MUL ( ( + | - ) MUL )*
+MUL              -> UNARIO ( ( * | / | % ) UNARIO )*
+UNARIO           -> ( - | ! ) UNARIO | PRIMARIO
+PRIMARIO         -> NUM_INT | NUM_DEC | TEXTO
+                  | func ID ( LISTA_ARGUMENTOS )
                   | ID ( [ COMPLEMENTO ] )*
-                  | ( EXPRESION )
+                  | ( COMPLEMENTO )
 ```
 
 Notas:
 
 - `COMP` agrupa `>`, `>=`, `<`, `<=`, `!=`, `==`.
+- `main` puede escribirse como `main()` o `void main()`; también se acepta
+  `int main()` para no rechazar programas equivalentes.
+- `else if (...)` se admite como extensión práctica del `else BLOQUE`.
 - Las dimensiones se aceptan después del identificador
-  (`int notas[10];`, estilo C) y también después del tipo
-  (`int[10] notas;`). La forma usada en las pruebas es la primera.
-- `COMPLEMENTO` admite números enteros y decimales, textos entre comillas
-  dobles, identificadores, arreglos, paréntesis y operadores aritméticos,
-  lógicos y relacionales.
+  (`int notas[10];`, estilo C) y después del tipo (`int[10] notas;`).
+- `func` es una palabra reservada nueva del lexer, usada para llamar
+  funciones: `func suma(2, 3);` o `x = func suma(2, 3);`.
+- `scanf` y `println` son comandos incorporados del lenguaje LP.
+- No se reconoce `for`: la gramática de la especificación no lo incluye.
+
+### Convenciones de tokens
+
+| Terminal de la gramática | Token emitido por el lexer |
+|---|---|
+| `id` | `ID` |
+| `num_int` | `NUM_INT` |
+| `num_dec` | `NUM_DEC` |
+| `texto` | `TEXTO` |
+| `comp` | `COMP` (`>`, `>=`, `<`, `<=`, `!=`, `==`) |
+| `func` | `FUNC` (palabra reservada agregada) |
+| `int`, `float`, `char`, `boolean`, `void` | `INT`, `FLOAT`, `CHAR`, `BOOLEAN`, `VOID` |
+| `main`, `if`, `else`, `while`, `return` | `MAIN`, `IF`, `ELSE`, `WHILE`, `RETURN` |
+| `scanf`, `println` | `SCANF`, `PRINTLN` |
+| Símbolos `{ } ( ) [ ] ; , =` | `LLAVE_*`, `PAR_*`, `CORCH_*`, `PUNTO_COMA`, `COMA`, `ASIGNACION` |
+
+El parser compara estos tipos de token mediante `comprobar()` y `consumir()`;
+no vuelve a analizar caracteres.
 
 ---
 
@@ -78,10 +115,10 @@ Notas:
 ├── src/
 │   ├── Token.h / Token.cpp     # Tipos de token y su nombre legible
 │   ├── Lexer.h / Lexer.cpp     # Analizador léxico + errores léxicos
-│   ├── TablaSimbolos.h         # Variables declaradas y su tipo
+│   ├── TablaSimbolos.h         # Registro de variables declaradas
 │   ├── Parser.h / Parser.cpp   # Analizador sintáctico recursivo descendente
-│   └── main.cpp                # Interfaz de línea de comandos y reportes
-├── casos_de_prueba/            # Programas .lp válidos e inválidos
+│   └── main.cpp                # CLI, reportes y códigos de salida
+├── casos_de_prueba/            # 11 programas válidos y 17 inválidos
 ├── pruebas/
 │   └── ejecutar_pruebas.sh     # Ejecuta todos los casos y genera evidencias
 ├── evidencias/                 # Salidas completas de cada caso
@@ -147,54 +184,81 @@ Códigos de salida:
 
 | Código | Significado |
 |---|---|
-| `0` | El programa LP es sintácticamente válido (puede haber advertencias). |
+| `0` | El programa LP es sintácticamente válido. |
 | `1` | Se detectaron errores léxicos o sintácticos. |
 | `2` | Error de uso (archivo inexistente, opción inválida, etc.). |
 
+La columna se conserva internamente para ubicar el caret, pero los reportes
+muestran solo la línea, según lo solicitado.
+
 ---
 
-## 6. Ejemplo mínimo reconocido
+## 6. Ejemplo con funciones y llamadas
 
-Archivo `casos_de_prueba/valido_basico.lp`:
+Archivo `casos_de_prueba/valido_funciones.lp`:
 
 ```c
+int suma(int a, int b) {
+    int resultado;
+    resultado = a + b;
+    return resultado;
+}
+
+float promedio(float a, float b) {
+    return (a + b) / 2;
+}
+
 void main() {
-    int edad;
-    float promedio;
-    edad = 20;
-    promedio = 15.5;
+    int x;
+    float p;
+    x = func suma(4, 6);
+    p = func promedio(15.5, 12.25);
+    println(x);
+    println(p);
 }
 ```
 
 Salida (resumida):
 
 ```text
-SECUENCIA DE TOKENS (ANÁLISIS LÉXICO)
-...
-TRAZA DE RECONOCIMIENTO SINTÁCTICO
 PROGRAMA
-  TIPO_RETORNO: void
+  LISTA_FUNCIONES
+    FUNCION
+      TIPO_RETORNO: int
+      ID: suma
+      PARAMETROS
+        TIPO
+          TIPO_BASE: int
+        PARAMETRO: a (int)
+        ...
+      BLOQUE
+        LISTA_VARIABLES
+          DECLARACION
+            ...
+        COMANDOS
+          ASIGNACION
+            ...
+          RETURN
+            ...
   PRINCIPAL
-  BLOQUE
-    DECLARACION
-      TIPO
-        TIPO_BASE: int
+    TIPO_RETORNO: void
+    main ( )
+    BLOQUE
       LISTA_VARIABLES
-        LISTA_ID
-          ID: edad (int)
-        PUNTO_COMA: ;
-    ...
-    ASIGNACION
-      OBJETIVO: edad
-      ASIGNACION: =
-      COMPLEMENTO
-        EXPRESION: 20
-      PUNTO_COMA: ;
-...
+        ...
+      COMANDOS
+        ASIGNACION
+          COMPLEMENTO
+            LLAMADA
+              ID: suma
+              ...
+        LLAMADA
+          ID: println
+          ...
 RESULTADO FINAL: PROGRAMA VÁLIDO
 ```
 
-La salida completa está en `evidencias/valido_basico.txt`.
+La salida completa está en `evidencias/valido_funciones.txt`.
 
 ---
 
@@ -214,7 +278,7 @@ Salida:
 ```text
 DIAGNÓSTICO
 ------------------------------------------------------------------------------
-[ERROR SINTACTICO] Línea 3, columna 5: se esperaba ';' al final de la declaración (LISTA_VARIABLES), pero se encontró 'edad' (ID)
+[ERROR SINTACTICO] Línea 3: se esperaba ';' al final de la declaración (LISTA_VARIABLES), pero se encontró 'edad' (ID)
       3 |     edad = 20;
         |     ^
         Sugerencia: Falta ';' al final de la sentencia de la línea 2.
@@ -222,8 +286,15 @@ DIAGNÓSTICO
 RESULTADO FINAL: PROGRAMA CON ERRORES
 ```
 
-El parser informa el token encontrado y la línea donde probablemente falta el
-punto y coma; además continúa el análisis para detectar más errores.
+Otro caso representativo:
+
+```text
+void main() {
+    int a;
+    a = 1;
+    int b;      <-- las variables deben declararse antes de los comandos
+}
+```
 
 ---
 
@@ -232,18 +303,28 @@ punto y coma; además continúa el análisis para detectar más errores.
 | Caso | Mensaje principal | Archivo de prueba |
 |---|---|---|
 | Falta `;` en declaración o asignación | `se esperaba ';' ...` | `invalido_falta_punto_coma.lp` |
-| Falta `}` de cierre del bloque | `bloque sin cerrar: se esperaba '}' ...` | `invalido_llave_sin_cerrar.lp` |
-| Falta `)` en `main()` | `se esperaba ')' para cerrar los parámetros ...` | `invalido_parentesis_sin_cerrar.lp` |
-| Falta `]` en una dimensión | `se esperaba ']' para cerrar la DIMENSION ...` | `invalido_dimension_sin_cerrar.lp` |
+| Falta `;` en `return` o llamada | `se esperaba ';' ...` | `invalido_return_sin_punto_coma.lp`, `invalido_llamada_sin_punto_coma.lp` |
+| Falta `}` de cierre | `bloque sin cerrar ...` | `invalido_llave_sin_cerrar.lp` |
+| Falta `)` en `main`, `if` o `while` | `se esperaba ')' ...` | `invalido_parentesis_sin_cerrar.lp`, `invalido_if_sin_parentesis.lp` |
+| Falta `]` en una dimensión | `se esperaba ']' ...` | `invalido_dimension_sin_cerrar.lp` |
 | Token inesperado | `token inesperado ...` | `invalido_token_inesperado.lp` |
+| Declaración después de un comando | `las variables deben declararse antes de los comandos` | `invalido_declaracion_despues_comando.lp` |
 | Falta `=` en una asignación | `se esperaba '=' ...` | `invalido_falta_igual.lp` |
+| Expresión incompleta | `se esperaba una expresión ...` | `invalido_asignacion_sin_expresion.lp` |
+| `if` sin bloque | `'{' para iniciar el bloque de 'if'` | `invalido_if_sin_bloque.lp` |
+| Función sin `(` | `'(' después del nombre de la función` | `invalido_funcion_sin_parentesis.lp` |
+| Llamada sin `func` | `las llamadas a función deben comenzar con 'func'` | `invalido_llamada_sin_func.lp` |
+| Llamada sin nombre | `un nombre de función (ID)` | `invalido_func_sin_nombre.lp` |
+| `else` sin `if` | `token inesperado 'else'` | `invalido_else_sin_if.lp` |
 | Carácter no reconocido | `carácter no reconocido ...` | `invalido_caracter_no_reconocido.lp` |
-| Variable no declarada | Advertencia, no error | (uso de `x = 1;` sin declarar) |
-| Variable redeclarada | Advertencia, no error | `int a; int a;` |
 
 Los errores léxicos y sintácticos no detienen el programa en el primer fallo:
 `Parser::sincronizar()` avanza hasta `;` o `}` y el bloque continúa, lo que
 permite reportar varios problemas en una sola ejecución.
+
+> Por decisión de la especificación, **no se realiza análisis semántico**: no se
+> comprueba si una variable fue declarada, si los tipos son compatibles ni si
+> una función existe. La tabla de símbolos solo registra declaraciones.
 
 ---
 
@@ -262,49 +343,53 @@ El script:
 2. Ejecuta todos los `.lp` de `casos_de_prueba/`.
 3. Comprueba que los `valido_*.lp` terminen con código `0` y los
    `invalido_*.lp` con código `1`.
-4. Guarda la salida completa de cada caso en `evidencias/<nombre>.txt`.
-5. Genera `evidencias/resumen.txt` con el resultado de la corrida.
+4. Verifica además el veredicto impreso (`PROGRAMA VÁLIDO` / `PROGRAMA CON ERRORES`).
+5. Guarda la salida completa de cada caso en `evidencias/<nombre>.txt`.
+6. Genera `evidencias/resumen.txt` con el resultado de la corrida.
 
-Casos incluidos:
+Casos válidos incluidos:
 
-| Archivo | Resultado esperado |
+| Archivo | Qué cubre |
 |---|---|
-| `valido_basico.lp` | Válido |
-| `valido_completo.lp` | Válido (declaraciones múltiples, arreglos, expresiones) |
-| `invalido_falta_punto_coma.lp` | Error sintáctico |
-| `invalido_dimension_sin_cerrar.lp` | Error sintáctico |
-| `invalido_falta_igual.lp` | Error sintáctico |
-| `invalido_llave_sin_cerrar.lp` | Error sintáctico |
-| `invalido_parentesis_sin_cerrar.lp` | Error sintáctico |
-| `invalido_token_inesperado.lp` | Error sintáctico |
-| `invalido_caracter_no_reconocido.lp` | Error léxico |
+| `valido_basico.lp` | Ejemplo mínimo de declaraciones y asignaciones |
+| `valido_completo.lp` | Variables múltiples, arreglos, expresiones y texto |
+| `valido_funciones.lp` | Funciones con parámetros, `return` y llamadas |
+| `valido_if_else.lp` | `if`, `else`, `else if` y operadores lógicos |
+| `valido_while.lp` | Ciclo `while` con acumulador |
+| `valido_anidado.lp` | Bloques anidados y declaraciones locales |
+| `valido_expresiones.lp` | Precedencia, paréntesis, unarios y relacionales |
+| `valido_llamadas.lp` | Llamadas como comando y dentro de expresiones |
+| `valido_arreglos.lp` | Arreglos y subíndices |
+| `valido_sin_variables.lp` | Bloque sin declaraciones |
+| `valido_scanf.lp` | `scanf` y `println` |
+
+Los 17 casos inválidos cubren errores de puntuación, llaves, paréntesis,
+corchetes, declaraciones fuera de orden, funciones, llamadas y expresiones.
 
 Resultado de la última corrida:
 
 ```text
-Total de casos:  9
-Aprobados:       9
+Total de casos:  28
+Aprobados:       28
 Fallidos:        0
 ```
 
 ---
 
-## 10. Limitaciones y siguientes pasos
+## 10. Limitaciones y decisiones
 
-Esta entrega cubre únicamente la estructura inicial del lenguaje LP:
-
-- No se reconocen bloques anidados, `if`, `else`, `for`, `while`, `return`,
-  `scanf`, `println` ni funciones adicionales.
-- No se admite inicialización en la declaración (`int x = 5;`); se debe
-  declarar y luego asignar.
+- **No se reconoce `for`**: la gramática de la especificación no lo incluye.
+- **No se construye un AST independiente**: la salida incluye la traza/árbol de
+  reconocimiento y el resultado del análisis. La estructura reconoce cada
+  producción y puede usarse como base para un AST posterior.
+- **No hay análisis semántico**: es una decisión explícita del proyecto; la
+  tabla de símbolos solo registra nombres y tipos declarados.
+- `if`, `else` y `while` exigen bloque entre llaves; `else if` se admite como
+  comodidad.
 - Las dimensiones deben ser constantes enteras (`NUM_INT`).
-- No hay verificación de tipos ni de rangos; la tabla de símbolos registra
-  nombres y tipos declarados.
-- Las constantes de texto usan comillas dobles (`"A"`); las comillas simples
-  no forman parte del lexer actual.
-- La recuperación de errores es básica (sincronización por `;` y `}`).
-
-Estos puntos quedan como trabajo para las siguientes entregas.
+- No se admite inicialización en la declaración (`int x = 5;`); se declara y
+  luego se asigna.
+- Los comentarios son de una línea (`//`); los textos usan comillas dobles.
 
 ---
 

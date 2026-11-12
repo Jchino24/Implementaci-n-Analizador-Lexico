@@ -1,8 +1,8 @@
 ==============================================================================
  ANALIZADOR LÉXICO Y SINTÁCTICO - LENGUAJE LP
- Entregable 1: integración lexer + parser
+ Proyecto integrador: parser con descenso recursivo
 ==============================================================================
-Archivo: /home/josfx/Documentos/deepseek-harness/default-workspace/analizador-lp/casos_de_prueba/invalido_token_inesperado.lp
+Archivo: casos_de_prueba/invalido_token_inesperado.lp
 
 SECUENCIA DE TOKENS (ANÁLISIS LÉXICO)
 ------------------------------------------------------------------------------

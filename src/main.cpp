@@ -213,7 +213,7 @@ int main(int argc, char* argv[]) {
 
     std::cout << kSeparador << "\n";
     std::cout << " ANALIZADOR LÉXICO Y SINTÁCTICO - LENGUAJE LP\n";
-    std::cout << " Entregable 1: integración lexer + parser\n";
+    std::cout << " Proyecto integrador: parser con descenso recursivo\n";
     std::cout << kSeparador << "\n";
     std::cout << "Archivo: " << ruta << "\n\n";
 

@@ -11,6 +11,7 @@
 set -uo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "$ROOT" || exit 2
 BUILD="$ROOT/build"
 BIN="$BUILD/analizador"
 EVIDENCIAS="$ROOT/evidencias"
@@ -56,7 +57,7 @@ for archivo in "${archivos[@]}"; do
     fi
 
     salida="$EVIDENCIAS/$nombre.txt"
-    "$BIN" "$archivo" > "$salida" 2>&1
+    "$BIN" "casos_de_prueba/$nombre.lp" > "$salida" 2>&1
     obtenido=$?
 
     # Ademas del codigo de salida, se comprueba el veredicto impreso.
