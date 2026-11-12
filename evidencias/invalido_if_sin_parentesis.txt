@@ -8,47 +8,40 @@ SECUENCIA DE TOKENS (ANÁLISIS LÉXICO)
 ------------------------------------------------------------------------------
 #    LEXEMA                  TOKEN           LINEA
 ------------------------------------------------------------------------------
-1    void                    VOID            1
-2    main                    MAIN            1
-3    (                       (               1
-4    )                       )               1
-5    {                       {               1
-6    if                      IF              2
-7    1                       NUM_INT         2
-8    <                       COMP            2
-9    2                       NUM_INT         2
-10   {                       {               2
-11   println                 PRINTLN         3
-12   (                       (               3
-13   x                       TEXTO           3
-14   )                       )               3
-15   ;                       ;               3
-16   }                       }               4
-17   }                       }               5
+1    main                    MAIN            1
+2    (                       (               1
+3    )                       )               1
+4    {                       {               1
+5    if                      IF              2
+6    1                       NUM_INT         2
+7    <                       COMP            2
+8    2                       NUM_INT         2
+9    {                       {               2
+10   println                 PRINTLN         3
+11   (                       (               3
+12   x                       TEXTO           3
+13   )                       )               3
+14   ;                       ;               3
+15   }                       }               4
+16   }                       }               5
 ------------------------------------------------------------------------------
-Total: 17 tokens
+Total: 16 tokens
 
 TRAZA DE RECONOCIMIENTO SINTÁCTICO
 ------------------------------------------------------------------------------
 PROGRAMA
   LISTA_FUNCIONES
   PRINCIPAL
-    TIPO_RETORNO: void
     main ( )
     BLOQUE
       LISTA_VARIABLES
       COMANDOS
-        IF
-          COMPLEMENTO
-            EXPRESION: 1 < 2
+        SELECCION
           BLOQUE
             LISTA_VARIABLES
             COMANDOS
-              LLAMADA
-                ID: println
-                ARGUMENTOS
-                  COMPLEMENTO
-                    EXPRESION: x
+              ESCRITURA
+                constante/texto: x
                 PUNTO_COMA: ;
             BLOQUE: cierre '}' en la línea 4
       BLOQUE: cierre '}' en la línea 5
@@ -59,12 +52,12 @@ TABLA DE SÍMBOLOS (VARIABLES DECLARADAS)
 
 DIAGNÓSTICO
 ------------------------------------------------------------------------------
-[ERROR SINTACTICO] Línea 2: se esperaba '(' después de 'if' en IF, pero se encontró '1' (NUM_INT)
+[ERROR SINTACTICO] Línea 2: se esperaba '(' después de 'if' en SELECCION, pero se encontró '1' (NUM_INT)
       2 |     if 1 < 2 {
         |        ^
-        Sugerencia: Formato esperado: if (condición) { ... }
+        Sugerencia: Formato esperado: if (expresión) { ... }
 
-[ERROR SINTACTICO] Línea 2: se esperaba ')' para cerrar la condición de 'if' en IF, pero se encontró '{'
+[ERROR SINTACTICO] Línea 2: se esperaba ')' para cerrar la condición de 'if' en SELECCION, pero se encontró '{'
       2 |     if 1 < 2 {
         |              ^
 

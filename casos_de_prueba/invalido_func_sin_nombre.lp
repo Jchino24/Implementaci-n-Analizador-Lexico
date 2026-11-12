@@ -1,3 +1,3 @@
-void main() {
-    func (1);
+main() {
+    func (1)
 }

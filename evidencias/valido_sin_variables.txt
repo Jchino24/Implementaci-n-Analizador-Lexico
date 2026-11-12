@@ -8,84 +8,69 @@ SECUENCIA DE TOKENS (ANÁLISIS LÉXICO)
 ------------------------------------------------------------------------------
 #    LEXEMA                  TOKEN           LINEA
 ------------------------------------------------------------------------------
-1    void                    VOID            1
-2    main                    MAIN            1
-3    (                       (               1
-4    )                       )               1
-5    {                       {               1
-6    println                 PRINTLN         2
-7    (                       (               2
-8    inicio                  TEXTO           2
-9    )                       )               2
-10   ;                       ;               2
-11   if                      IF              3
-12   (                       (               3
-13   1                       NUM_INT         3
-14   <                       COMP            3
-15   2                       NUM_INT         3
-16   )                       )               3
-17   {                       {               3
-18   println                 PRINTLN         4
-19   (                       (               4
-20   ok                      TEXTO           4
-21   )                       )               4
-22   ;                       ;               4
-23   }                       }               5
-24   while                   WHILE           6
-25   (                       (               6
-26   0                       NUM_INT         6
-27   )                       )               6
-28   {                       {               6
-29   println                 PRINTLN         7
-30   (                       (               7
-31   no                      TEXTO           7
-32   )                       )               7
-33   ;                       ;               7
-34   }                       }               8
-35   }                       }               9
+1    main                    MAIN            1
+2    (                       (               1
+3    )                       )               1
+4    {                       {               1
+5    println                 PRINTLN         2
+6    (                       (               2
+7    inicio                  TEXTO           2
+8    )                       )               2
+9    ;                       ;               2
+10   if                      IF              3
+11   (                       (               3
+12   1                       NUM_INT         3
+13   <                       COMP            3
+14   2                       NUM_INT         3
+15   )                       )               3
+16   {                       {               3
+17   println                 PRINTLN         4
+18   (                       (               4
+19   ok                      TEXTO           4
+20   )                       )               4
+21   ;                       ;               4
+22   }                       }               5
+23   while                   WHILE           6
+24   (                       (               6
+25   0                       NUM_INT         6
+26   )                       )               6
+27   {                       {               6
+28   println                 PRINTLN         7
+29   (                       (               7
+30   no                      TEXTO           7
+31   )                       )               7
+32   ;                       ;               7
+33   }                       }               8
+34   }                       }               9
 ------------------------------------------------------------------------------
-Total: 35 tokens
+Total: 34 tokens
 
 TRAZA DE RECONOCIMIENTO SINTÁCTICO
 ------------------------------------------------------------------------------
 PROGRAMA
   LISTA_FUNCIONES
   PRINCIPAL
-    TIPO_RETORNO: void
     main ( )
     BLOQUE
       LISTA_VARIABLES
       COMANDOS
-        LLAMADA
-          ID: println
-          ARGUMENTOS
-            COMPLEMENTO
-              EXPRESION: inicio
+        ESCRITURA
+          constante/texto: inicio
           PUNTO_COMA: ;
-        IF
-          COMPLEMENTO
-            EXPRESION: 1 < 2
+        SELECCION
           BLOQUE
             LISTA_VARIABLES
             COMANDOS
-              LLAMADA
-                ID: println
-                ARGUMENTOS
-                  COMPLEMENTO
-                    EXPRESION: ok
+              ESCRITURA
+                constante/texto: ok
                 PUNTO_COMA: ;
             BLOQUE: cierre '}' en la línea 5
-        WHILE
-          COMPLEMENTO
-            EXPRESION: 0
+        MIENTRAS
           BLOQUE
             LISTA_VARIABLES
             COMANDOS
-              LLAMADA
-                ID: println
-                ARGUMENTOS
-                  COMPLEMENTO
-                    EXPRESION: no
+              ESCRITURA
+                constante/texto: no
                 PUNTO_COMA: ;
             BLOQUE: cierre '}' en la línea 8
       BLOQUE: cierre '}' en la línea 9

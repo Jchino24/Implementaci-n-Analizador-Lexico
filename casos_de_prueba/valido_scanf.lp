@@ -1,4 +1,4 @@
-void main() {
+main() {
     int edad;
     float nota;
     scanf(edad);

@@ -1,11 +1,12 @@
 // Prueba integral: declaraciones, arreglos, expresiones y comentarios.
-void main() {
+main() {
     int edad, contador;
     float promedio, nota1, nota2;
     char inicial;
     boolean aprobado;
-    int notas[10];
-    int matriz[3][3];
+    int[10] notas;
+    int[3][3] matriz;
+    int auxiliar;
 
     edad = 20;
     contador = 0;
@@ -14,7 +15,7 @@ void main() {
     promedio = (nota1 + nota2) / 2;
     inicial = "A";
     aprobado = nota1 >= nota2;
-    notas[0] = 18;
-    matriz[1][2] = 7;
+    auxiliar = notas[0];
+    auxiliar = matriz[1][2];
     contador = contador + 1;
 }

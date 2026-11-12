@@ -6,10 +6,10 @@ int duplicar(int n) {
     return n * 2;
 }
 
-void main() {
+main() {
     int valor;
     valor = 5;
-    func saludar();
+    func saludar()
     valor = func duplicar(valor);
-    println(func duplicar(valor));
+    println(valor);
 }

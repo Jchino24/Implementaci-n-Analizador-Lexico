@@ -8,214 +8,212 @@ SECUENCIA DE TOKENS (ANÁLISIS LÉXICO)
 ------------------------------------------------------------------------------
 #    LEXEMA                  TOKEN           LINEA
 ------------------------------------------------------------------------------
-1    void                    VOID            1
-2    main                    MAIN            1
-3    (                       (               1
-4    )                       )               1
-5    {                       {               1
-6    int                     INT             2
-7    a                       ID              2
-8    ;                       ;               2
-9    int                     INT             3
-10   b                       ID              3
-11   ;                       ;               3
-12   int                     INT             4
-13   c                       ID              4
-14   ;                       ;               4
-15   int                     INT             5
-16   r                       ID              5
-17   ;                       ;               5
-18   a                       ID              6
-19   =                       =               6
-20   2                       NUM_INT         6
-21   ;                       ;               6
-22   b                       ID              7
-23   =                       =               7
-24   3                       NUM_INT         7
-25   ;                       ;               7
-26   c                       ID              8
-27   =                       =               8
-28   4                       NUM_INT         8
-29   ;                       ;               8
-30   r                       ID              9
-31   =                       =               9
-32   a                       ID              9
-33   +                       +               9
-34   b                       ID              9
-35   *                       *               9
-36   c                       ID              9
-37   -                       -               9
-38   5                       NUM_INT         9
-39   /                       /               9
-40   2                       NUM_INT         9
-41   %                       %               9
-42   3                       NUM_INT         9
-43   ;                       ;               9
-44   r                       ID              10
-45   =                       =               10
-46   (                       (               10
-47   a                       ID              10
-48   +                       +               10
-49   b                       ID              10
-50   )                       )               10
-51   *                       *               10
-52   (                       (               10
-53   c                       ID              10
-54   -                       -               10
-55   1                       NUM_INT         10
-56   )                       )               10
-57   ;                       ;               10
-58   r                       ID              11
-59   =                       =               11
-60   !                       !               11
-61   0                       NUM_INT         11
-62   &&                      &&              11
-63   (                       (               11
-64   a                       ID              11
-65   <                       COMP            11
-66   b                       ID              11
-67   )                       )               11
-68   ||                      ||              11
-69   (                       (               11
-70   c                       ID              11
-71   >=                      COMP            11
-72   4                       NUM_INT         11
-73   )                       )               11
-74   ;                       ;               11
-75   r                       ID              12
-76   =                       =               12
-77   -                       -               12
-78   a                       ID              12
-79   +                       +               12
-80   b                       ID              12
-81   ;                       ;               12
-82   r                       ID              13
-83   =                       =               13
-84   a                       ID              13
-85   ==                      COMP            13
-86   b                       ID              13
-87   ||                      ||              13
-88   a                       ID              13
-89   !=                      COMP            13
-90   c                       ID              13
-91   &&                      &&              13
-92   !                       !               13
-93   0                       NUM_INT         13
-94   ;                       ;               13
-95   }                       }               14
+1    main                    MAIN            1
+2    (                       (               1
+3    )                       )               1
+4    {                       {               1
+5    int                     INT             2
+6    a                       ID              2
+7    ;                       ;               2
+8    int                     INT             3
+9    b                       ID              3
+10   ;                       ;               3
+11   int                     INT             4
+12   c                       ID              4
+13   ;                       ;               4
+14   int                     INT             5
+15   r                       ID              5
+16   ;                       ;               5
+17   a                       ID              6
+18   =                       =               6
+19   2                       NUM_INT         6
+20   ;                       ;               6
+21   b                       ID              7
+22   =                       =               7
+23   3                       NUM_INT         7
+24   ;                       ;               7
+25   c                       ID              8
+26   =                       =               8
+27   4                       NUM_INT         8
+28   ;                       ;               8
+29   r                       ID              9
+30   =                       =               9
+31   a                       ID              9
+32   +                       +               9
+33   b                       ID              9
+34   *                       *               9
+35   c                       ID              9
+36   -                       -               9
+37   5                       NUM_INT         9
+38   /                       /               9
+39   2                       NUM_INT         9
+40   %                       %               9
+41   3                       NUM_INT         9
+42   ;                       ;               9
+43   r                       ID              10
+44   =                       =               10
+45   (                       (               10
+46   a                       ID              10
+47   +                       +               10
+48   b                       ID              10
+49   )                       )               10
+50   *                       *               10
+51   (                       (               10
+52   c                       ID              10
+53   -                       -               10
+54   1                       NUM_INT         10
+55   )                       )               10
+56   ;                       ;               10
+57   r                       ID              11
+58   =                       =               11
+59   !                       !               11
+60   0                       NUM_INT         11
+61   &&                      &&              11
+62   (                       (               11
+63   a                       ID              11
+64   <                       COMP            11
+65   b                       ID              11
+66   )                       )               11
+67   ||                      ||              11
+68   (                       (               11
+69   c                       ID              11
+70   >=                      COMP            11
+71   4                       NUM_INT         11
+72   )                       )               11
+73   ;                       ;               11
+74   r                       ID              12
+75   =                       =               12
+76   -                       -               12
+77   a                       ID              12
+78   +                       +               12
+79   b                       ID              12
+80   ;                       ;               12
+81   r                       ID              13
+82   =                       =               13
+83   a                       ID              13
+84   ==                      COMP            13
+85   b                       ID              13
+86   ||                      ||              13
+87   a                       ID              13
+88   !=                      COMP            13
+89   c                       ID              13
+90   &&                      &&              13
+91   !                       !               13
+92   0                       NUM_INT         13
+93   ;                       ;               13
+94   r                       ID              14
+95   =                       =               14
+96   +                       +               14
+97   a                       ID              14
+98   ;                       ;               14
+99   }                       }               15
 ------------------------------------------------------------------------------
-Total: 95 tokens
+Total: 99 tokens
 
 TRAZA DE RECONOCIMIENTO SINTÁCTICO
 ------------------------------------------------------------------------------
 PROGRAMA
   LISTA_FUNCIONES
   PRINCIPAL
-    TIPO_RETORNO: void
     main ( )
     BLOQUE
       LISTA_VARIABLES
         DECLARACION
           TIPO
             TIPO_BASE: int
-          LISTA_VARIABLES
-            LISTA_ID
-              ID: a (int)
-            PUNTO_COMA: ;
+          LISTA_ID
+            id: a (int)
+          PUNTO_COMA: ;
         DECLARACION
           TIPO
             TIPO_BASE: int
-          LISTA_VARIABLES
-            LISTA_ID
-              ID: b (int)
-            PUNTO_COMA: ;
+          LISTA_ID
+            id: b (int)
+          PUNTO_COMA: ;
         DECLARACION
           TIPO
             TIPO_BASE: int
-          LISTA_VARIABLES
-            LISTA_ID
-              ID: c (int)
-            PUNTO_COMA: ;
+          LISTA_ID
+            id: c (int)
+          PUNTO_COMA: ;
         DECLARACION
           TIPO
             TIPO_BASE: int
-          LISTA_VARIABLES
-            LISTA_ID
-              ID: r (int)
-            PUNTO_COMA: ;
+          LISTA_ID
+            id: r (int)
+          PUNTO_COMA: ;
       COMANDOS
         ASIGNACION
-          OBJETIVO: a
+          id: a
           ASIGNACION: =
           COMPLEMENTO
-            EXPRESION: 2
+            COMPLEMENTO: 2
           PUNTO_COMA: ;
         ASIGNACION
-          OBJETIVO: b
+          id: b
           ASIGNACION: =
           COMPLEMENTO
-            EXPRESION: 3
+            COMPLEMENTO: 3
           PUNTO_COMA: ;
         ASIGNACION
-          OBJETIVO: c
+          id: c
           ASIGNACION: =
           COMPLEMENTO
-            EXPRESION: 4
+            COMPLEMENTO: 4
           PUNTO_COMA: ;
         ASIGNACION
-          OBJETIVO: r
+          id: r
           ASIGNACION: =
           COMPLEMENTO
-            ID: a
-            ID: b
-            ID: c
-            EXPRESION: a + b * c - 5 / 2 % 3
+            id: a
+            id: b
+            id: c
+            COMPLEMENTO: a + b * c - 5 / 2 % 3
           PUNTO_COMA: ;
         ASIGNACION
-          OBJETIVO: r
+          id: r
           ASIGNACION: =
           COMPLEMENTO
-            COMPLEMENTO
-              ID: a
-              ID: b
-              EXPRESION: a + b
-            COMPLEMENTO
-              ID: c
-              EXPRESION: c - 1
-            EXPRESION: ( a + b ) * ( c - 1 )
+            id: a
+            id: b
+            id: c
+            COMPLEMENTO: ( a + b ) * ( c - 1 )
           PUNTO_COMA: ;
         ASIGNACION
-          OBJETIVO: r
+          id: r
           ASIGNACION: =
           COMPLEMENTO
-            COMPLEMENTO
-              ID: a
-              ID: b
-              EXPRESION: a < b
-            COMPLEMENTO
-              ID: c
-              EXPRESION: c >= 4
-            EXPRESION: ! 0 && ( a < b ) || ( c >= 4 )
+            id: a
+            id: b
+            id: c
+            COMPLEMENTO: ! 0 && ( a < b ) || ( c >= 4 )
           PUNTO_COMA: ;
         ASIGNACION
-          OBJETIVO: r
+          id: r
           ASIGNACION: =
           COMPLEMENTO
-            ID: a
-            ID: b
-            EXPRESION: - a + b
+            id: a
+            id: b
+            COMPLEMENTO: - a + b
           PUNTO_COMA: ;
         ASIGNACION
-          OBJETIVO: r
+          id: r
           ASIGNACION: =
           COMPLEMENTO
-            ID: a
-            ID: b
-            ID: a
-            ID: c
-            EXPRESION: a == b || a != c && ! 0
+            id: a
+            id: b
+            id: a
+            id: c
+            COMPLEMENTO: a == b || a != c && ! 0
           PUNTO_COMA: ;
-      BLOQUE: cierre '}' en la línea 14
+        ASIGNACION
+          id: r
+          ASIGNACION: =
+          COMPLEMENTO
+            id: a
+            COMPLEMENTO: + a
+          PUNTO_COMA: ;
+      BLOQUE: cierre '}' en la línea 15
 
 TABLA DE SÍMBOLOS (VARIABLES DECLARADAS)
 ------------------------------------------------------------------------------
@@ -234,7 +232,7 @@ RESULTADO
 ------------------------------------------------------------------------------
 Funciones reconocidas:          0
 Declaraciones reconocidas:      4
-Asignaciones reconocidas:       8
+Asignaciones reconocidas:       9
 Errores léxicos:               0
 Errores sintácticos:           0
 ==============================================================================

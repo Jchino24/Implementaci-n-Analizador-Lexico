@@ -8,177 +8,167 @@ SECUENCIA DE TOKENS (ANÁLISIS LÉXICO)
 ------------------------------------------------------------------------------
 #    LEXEMA                  TOKEN           LINEA
 ------------------------------------------------------------------------------
-1    void                    VOID            1
-2    main                    MAIN            1
-3    (                       (               1
-4    )                       )               1
-5    {                       {               1
-6    int                     INT             2
-7    edad                    ID              2
-8    ;                       ;               2
-9    int                     INT             3
-10   categoria               ID              3
-11   ;                       ;               3
-12   edad                    ID              4
-13   =                       =               4
-14   20                      NUM_INT         4
-15   ;                       ;               4
-16   if                      IF              5
-17   (                       (               5
-18   edad                    ID              5
-19   >=                      COMP            5
-20   18                      NUM_INT         5
-21   )                       )               5
-22   {                       {               5
-23   categoria               ID              6
-24   =                       =               6
-25   1                       NUM_INT         6
-26   ;                       ;               6
-27   }                       }               7
-28   else                    ELSE            7
-29   {                       {               7
-30   categoria               ID              8
-31   =                       =               8
-32   0                       NUM_INT         8
-33   ;                       ;               8
-34   }                       }               9
-35   if                      IF              10
-36   (                       (               10
-37   categoria               ID              10
-38   ==                      COMP            10
-39   1                       NUM_INT         10
-40   &&                      &&              10
-41   edad                    ID              10
-42   <                       COMP            10
-43   65                      NUM_INT         10
-44   )                       )               10
-45   {                       {               10
-46   println                 PRINTLN         11
-47   (                       (               11
-48   adulto                  TEXTO           11
-49   )                       )               11
-50   ;                       ;               11
-51   }                       }               12
-52   else                    ELSE            12
-53   if                      IF              12
-54   (                       (               12
-55   edad                    ID              12
-56   >=                      COMP            12
-57   65                      NUM_INT         12
-58   )                       )               12
-59   {                       {               12
-60   println                 PRINTLN         13
-61   (                       (               13
-62   adulto mayor            TEXTO           13
-63   )                       )               13
-64   ;                       ;               13
-65   }                       }               14
-66   else                    ELSE            14
-67   {                       {               14
-68   println                 PRINTLN         15
-69   (                       (               15
-70   menor                   TEXTO           15
-71   )                       )               15
-72   ;                       ;               15
-73   }                       }               16
-74   }                       }               17
+1    main                    MAIN            1
+2    (                       (               1
+3    )                       )               1
+4    {                       {               1
+5    int                     INT             2
+6    edad                    ID              2
+7    ;                       ;               2
+8    int                     INT             3
+9    categoria               ID              3
+10   ;                       ;               3
+11   edad                    ID              4
+12   =                       =               4
+13   20                      NUM_INT         4
+14   ;                       ;               4
+15   if                      IF              5
+16   (                       (               5
+17   edad                    ID              5
+18   >=                      COMP            5
+19   18                      NUM_INT         5
+20   )                       )               5
+21   {                       {               5
+22   categoria               ID              6
+23   =                       =               6
+24   1                       NUM_INT         6
+25   ;                       ;               6
+26   }                       }               7
+27   else                    ELSE            7
+28   {                       {               7
+29   categoria               ID              8
+30   =                       =               8
+31   0                       NUM_INT         8
+32   ;                       ;               8
+33   }                       }               9
+34   if                      IF              10
+35   (                       (               10
+36   categoria               ID              10
+37   ==                      COMP            10
+38   1                       NUM_INT         10
+39   &&                      &&              10
+40   edad                    ID              10
+41   <                       COMP            10
+42   65                      NUM_INT         10
+43   )                       )               10
+44   {                       {               10
+45   println                 PRINTLN         11
+46   (                       (               11
+47   adulto                  TEXTO           11
+48   )                       )               11
+49   ;                       ;               11
+50   }                       }               12
+51   else                    ELSE            12
+52   {                       {               12
+53   if                      IF              13
+54   (                       (               13
+55   edad                    ID              13
+56   >=                      COMP            13
+57   65                      NUM_INT         13
+58   )                       )               13
+59   {                       {               13
+60   println                 PRINTLN         14
+61   (                       (               14
+62   adulto mayor            TEXTO           14
+63   )                       )               14
+64   ;                       ;               14
+65   }                       }               15
+66   else                    ELSE            15
+67   {                       {               15
+68   println                 PRINTLN         16
+69   (                       (               16
+70   menor                   TEXTO           16
+71   )                       )               16
+72   ;                       ;               16
+73   }                       }               17
+74   }                       }               18
+75   }                       }               19
 ------------------------------------------------------------------------------
-Total: 74 tokens
+Total: 75 tokens
 
 TRAZA DE RECONOCIMIENTO SINTÁCTICO
 ------------------------------------------------------------------------------
 PROGRAMA
   LISTA_FUNCIONES
   PRINCIPAL
-    TIPO_RETORNO: void
     main ( )
     BLOQUE
       LISTA_VARIABLES
         DECLARACION
           TIPO
             TIPO_BASE: int
-          LISTA_VARIABLES
-            LISTA_ID
-              ID: edad (int)
-            PUNTO_COMA: ;
+          LISTA_ID
+            id: edad (int)
+          PUNTO_COMA: ;
         DECLARACION
           TIPO
             TIPO_BASE: int
-          LISTA_VARIABLES
-            LISTA_ID
-              ID: categoria (int)
-            PUNTO_COMA: ;
+          LISTA_ID
+            id: categoria (int)
+          PUNTO_COMA: ;
       COMANDOS
         ASIGNACION
-          OBJETIVO: edad
+          id: edad
           ASIGNACION: =
           COMPLEMENTO
-            EXPRESION: 20
+            COMPLEMENTO: 20
           PUNTO_COMA: ;
-        IF
-          COMPLEMENTO
-            ID: edad
-            EXPRESION: edad >= 18
+        SELECCION
+          id: edad
           BLOQUE
             LISTA_VARIABLES
             COMANDOS
               ASIGNACION
-                OBJETIVO: categoria
+                id: categoria
                 ASIGNACION: =
                 COMPLEMENTO
-                  EXPRESION: 1
+                  COMPLEMENTO: 1
                 PUNTO_COMA: ;
             BLOQUE: cierre '}' en la línea 7
-          BLOQUE
-            LISTA_VARIABLES
-            COMANDOS
-              ASIGNACION
-                OBJETIVO: categoria
-                ASIGNACION: =
-                COMPLEMENTO
-                  EXPRESION: 0
-                PUNTO_COMA: ;
-            BLOQUE: cierre '}' en la línea 9
-        IF
-          COMPLEMENTO
-            ID: categoria
-            ID: edad
-            EXPRESION: categoria == 1 && edad < 65
-          BLOQUE
-            LISTA_VARIABLES
-            COMANDOS
-              LLAMADA
-                ID: println
-                ARGUMENTOS
+          SINO
+            BLOQUE
+              LISTA_VARIABLES
+              COMANDOS
+                ASIGNACION
+                  id: categoria
+                  ASIGNACION: =
                   COMPLEMENTO
-                    EXPRESION: adulto
+                    COMPLEMENTO: 0
+                  PUNTO_COMA: ;
+              BLOQUE: cierre '}' en la línea 9
+        SELECCION
+          id: categoria
+          id: edad
+          BLOQUE
+            LISTA_VARIABLES
+            COMANDOS
+              ESCRITURA
+                constante/texto: adulto
                 PUNTO_COMA: ;
             BLOQUE: cierre '}' en la línea 12
-          IF
-            COMPLEMENTO
-              ID: edad
-              EXPRESION: edad >= 65
+          SINO
             BLOQUE
               LISTA_VARIABLES
               COMANDOS
-                LLAMADA
-                  ID: println
-                  ARGUMENTOS
-                    COMPLEMENTO
-                      EXPRESION: adulto mayor
-                  PUNTO_COMA: ;
-              BLOQUE: cierre '}' en la línea 14
-            BLOQUE
-              LISTA_VARIABLES
-              COMANDOS
-                LLAMADA
-                  ID: println
-                  ARGUMENTOS
-                    COMPLEMENTO
-                      EXPRESION: menor
-                  PUNTO_COMA: ;
-              BLOQUE: cierre '}' en la línea 16
-      BLOQUE: cierre '}' en la línea 17
+                SELECCION
+                  id: edad
+                  BLOQUE
+                    LISTA_VARIABLES
+                    COMANDOS
+                      ESCRITURA
+                        constante/texto: adulto mayor
+                        PUNTO_COMA: ;
+                    BLOQUE: cierre '}' en la línea 15
+                  SINO
+                    BLOQUE
+                      LISTA_VARIABLES
+                      COMANDOS
+                        ESCRITURA
+                          constante/texto: menor
+                          PUNTO_COMA: ;
+                      BLOQUE: cierre '}' en la línea 17
+              BLOQUE: cierre '}' en la línea 18
+      BLOQUE: cierre '}' en la línea 19
 
 TABLA DE SÍMBOLOS (VARIABLES DECLARADAS)
 ------------------------------------------------------------------------------

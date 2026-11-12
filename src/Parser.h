@@ -26,43 +26,61 @@ struct ErrorCompilacion {
 
 // Analizador sintactico recursivo descendente para el lenguaje LP.
 //
-// Gramatica implementada (EBNF):
+// La gramatica implementada es la del documento "Gramatica del Lenguaje LP":
 //
-//   PROGRAMA        -> LISTA_FUNCIONES PRINCIPAL
-//   LISTA_FUNCIONES -> FUNCION*
-//   FUNCION         -> TIPO_RETORNO ID ( LISTA_PARAMETROS ) BLOQUE
-//   TIPO_RETORNO    -> void | TIPO_BASE
-//   PRINCIPAL       -> [TIPO_RETORNO] main ( ) BLOQUE
-//   BLOQUE          -> { LISTA_VARIABLES COMANDOS }
-//   LISTA_VARIABLES -> (TIPO LISTA_ID ;)*
-//   COMANDOS        -> COMANDO*
-//   COMANDO         -> ASIGNACION | IF | WHILE | LLAMADA
-//                    | RETURN | SCANF | PRINTLN
-//   TIPO            -> TIPO_BASE DIMENSION*
-//   TIPO_BASE       -> int | float | char | boolean
-//   DIMENSION       -> [ NUM_INT ]
-//   LISTA_ID        -> ID DIMENSION* ( , ID DIMENSION* )*
-//   ASIGNACION      -> ID ( [ COMPLEMENTO ] )* = COMPLEMENTO ;
-//   IF              -> if ( COMPLEMENTO ) BLOQUE [ else ( IF | BLOQUE ) ]
-//   WHILE           -> while ( COMPLEMENTO ) BLOQUE
-//   LLAMADA         -> func ID ( LISTA_ARGUMENTOS ) [ ; ]
-//   RETURN          -> return [ COMPLEMENTO ] ;
-//   SCANF/PRINTLN   -> (scanf|println) ( LISTA_ARGUMENTOS ) ;
-//   LISTA_PARAMETROS-> ( TIPO ID (DIMENSION*) ( , ... )* )?
-//   LISTA_ARGUMENTOS-> ( COMPLEMENTO ( , COMPLEMENTO )* )?
-//   COMPLEMENTO     -> OR
-//   OR              -> AND ( || AND )*
-//   AND             -> REL ( && REL )*
-//   REL             -> ADD ( COMP ADD )*
-//   ADD             -> MUL ( (+|-) MUL )*
-//   MUL             -> UNARIO ( (*|/|%) UNARIO )*
-//   UNARIO          -> (-|!) UNARIO | PRIMARIO
-//   PRIMARIO        -> NUM_INT | NUM_DEC | TEXTO
-//                    | func ID ( LISTA_ARGUMENTOS )
-//                    | ID ( [ COMPLEMENTO ] )*
-//                    | ( COMPLEMENTO )
+//   PROGRAMA                -> LISTA_FUNCIONES PRINCIPAL
+//   LISTA_FUNCIONES         -> DECLARACION_FUNCION LISTA_FUNCIONES | epsilon
+//   DECLARACION_FUNCION     -> TIPO_RETORNO id ( PARAMETROS ) BLOQUE
+//   TIPO_RETORNO            -> TIPO | void
+//   TIPO                    -> TIPO_BASE DIMENSION
+//   TIPO_BASE               -> char | float | int | boolean
+//   DIMENSION               -> [ num_int ] DIMENSION | epsilon
+//   PARAMETROS              -> TIPO id LISTA_PARAMETROS | epsilon
+//   LISTA_PARAMETROS        -> , TIPO id LISTA_PARAMETROS | epsilon
+//   PRINCIPAL               -> main ( ) BLOQUE
+//   BLOQUE                  -> { LISTA_VARIABLES COMANDOS }
+//   LISTA_VARIABLES         -> TIPO id LISTA_ID ; LISTA_VARIABLES | epsilon
+//   LISTA_ID                -> , id LISTA_ID | epsilon
+//   COMANDOS                -> COMANDO COMANDOS | epsilon
+//   COMANDO                 -> LECTURA | ESCRITURA | ASIGNACION | FUNCION
+//                            | SELECCION | MIENTRAS | RETORNO
+//   LECTURA                 -> scanf ( TERMINO_LECTURA NUEVO_TERMINO_LECTURA ) ;
+//   TERMINO_LECTURA         -> id DIMENSION2
+//   NUEVO_TERMINO_LECTURA   -> , TERMINO_LECTURA NUEVO_TERMINO_LECTURA | epsilon
+//   DIMENSION2              -> [ EXPRESION_ADITIVA ] DIMENSION2 | epsilon
+//   ESCRITURA               -> println ( TERMINO_ESCRITURA NUEVO_TERMINO_ESCRITURA ) ;
+//   TERMINO_ESCRITURA       -> id DIMENSION2 | CONSTANTE | texto
+//   NUEVO_TERMINO_ESCRITURA -> , TERMINO_ESCRITURA NUEVO_TERMINO_ESCRITURA | epsilon
+//   SELECCION               -> if ( EXPRESION ) BLOQUE SINO
+//   SINO                    -> else BLOQUE | epsilon
+//   MIENTRAS                -> while ( EXPRESION ) BLOQUE
+//   ASIGNACION              -> id = COMPLEMENTO ;
+//   COMPLEMENTO             -> EXPRESION | FUNCION
+//   FUNCION                 -> func id ( ARGUMENTOS )
+//   ARGUMENTOS              -> EXPRESION NUEVO_ARGUMENTO | epsilon
+//   NUEVO_ARGUMENTO         -> , EXPRESION NUEVO_ARGUMENTO | epsilon
+//   RETORNO                 -> return EXPRESION ;
+//   EXPRESION               -> EXPRESION_O
+//   EXPRESION_O             -> EXPRESION_Y EXPRESION_O2
+//   EXPRESION_O2            -> || EXPRESION_Y EXPRESION_O2 | epsilon
+//   EXPRESION_Y             -> EXPRESION_RELACIONAL EXPRESION_Y2
+//   EXPRESION_Y2            -> && EXPRESION_RELACIONAL EXPRESION_Y2 | epsilon
+//   EXPRESION_RELACIONAL    -> EXPRESION_ADITIVA EXPRESION_RELACIONAL2
+//   EXPRESION_RELACIONAL2   -> comp EXPRESION_ADITIVA | epsilon
+//   EXPRESION_ADITIVA       -> EXPRESION_MULTIPLICATIVA EXPRESION_ADITIVA2
+//   EXPRESION_ADITIVA2      -> OPERADOR_ADITIVO EXPRESION_MULTIPLICATIVA
+//                              EXPRESION_ADITIVA2 | epsilon
+//   OPERADOR_ADITIVO        -> + | -
+//   EXPRESION_MULTIPLICATIVA-> FACTOR EXPRESION_MULTIPLICATIVA2
+//   EXPRESION_MULTIPLICATIVA2 -> OPERADOR_MULTIPLICATIVO FACTOR
+//                              EXPRESION_MULTIPLICATIVA2 | epsilon
+//   OPERADOR_MULTIPLICATIVO -> * | / | %
+//   FACTOR                  -> SIGNO TERMINO | texto | ! FACTOR | ( EXPRESION )
+//   TERMINO                 -> id DIMENSION2 | CONSTANTE
+//   SIGNO                   -> + | - | epsilon
+//   CONSTANTE               -> num_int | num_dec
 //
-// La llamada a funcion usa el terminal `func`, incorporado al lexer.
+// Las funciones del parser llevan el nombre del no terminal que reconocen.
 class Parser {
 public:
     explicit Parser(const std::string& rutaArchivo);
@@ -126,6 +144,7 @@ private:
     static std::string describirToken(const Token& token);
     std::string textoEntre(std::size_t inicio, std::size_t fin) const;
     void sincronizar();
+    std::size_t saltarTipoEn(std::size_t indice) const;
     bool esInicioFuncion() const;
 
     // --- Errores ----------------------------------------------------------
@@ -143,36 +162,41 @@ private:
     // --- Producciones de la gramatica ------------------------------------
     bool reconocerPrograma();
     bool reconocerListaFunciones();
-    bool reconocerFuncion();
+    bool reconocerDeclaracionFuncion();
+    InfoTipo reconocerTipoRetorno();
+    InfoTipo reconocerTipo();
+    InfoTipo reconocerTipoBase();
+    bool reconocerDimension(InfoTipo& tipo);
+    bool reconocerParametros();
     bool reconocerPrincipal();
     bool reconocerBloque();
     bool reconocerListaVariables();
     bool reconocerDeclaracion();
-    bool reconocerListaVariablesDeclaracion(const InfoTipo& tipo);
+    bool reconocerListaId(const InfoTipo& tipo);
     bool reconocerComandos();
     bool reconocerComando();
+    bool reconocerLectura();
+    bool reconocerTerminoLectura();
+    bool reconocerDimension2();
+    bool reconocerEscritura();
+    bool reconocerTerminoEscritura();
+    bool reconocerSeleccion();
+    bool reconocerSino();
+    bool reconocerMientras();
     bool reconocerAsignacion();
-    bool reconocerIf();
-    bool reconocerWhile();
-    bool reconocerLlamada(bool consumirPuntoComa);
-    bool reconocerLlamadaIncorporada();
-    bool reconocerReturn();
-    bool reconocerListaParametros();
-    bool reconocerListaArgumentos();
-    InfoTipo reconocerTipoRetorno();
-    InfoTipo reconocerTipo();
-    InfoTipo reconocerTipoBase(bool permitirVoid);
-    bool reconocerDimension(InfoTipo& tipo);
-    std::vector<std::string> reconocerListaId(const InfoTipo& tipo, bool& ok);
-    bool reconocerSubindices();
     bool reconocerComplemento();
-    bool reconocerOr();
-    bool reconocerAnd();
-    bool reconocerRelacional();
-    bool reconocerAditivo();
-    bool reconocerMultiplicativo();
-    bool reconocerUnario();
-    bool reconocerPrimario();
+    bool reconocerFuncion();
+    bool reconocerArgumentos();
+    bool reconocerRetorno();
+    bool reconocerExpresion();
+    bool reconocerExpresionO();
+    bool reconocerExpresionY();
+    bool reconocerExpresionRelacional();
+    bool reconocerExpresionAditiva();
+    bool reconocerExpresionMultiplicativa();
+    bool reconocerFactor();
+    bool reconocerTermino();
+    bool reconocerConstante();
 };
 
 #endif  // PARSER_H

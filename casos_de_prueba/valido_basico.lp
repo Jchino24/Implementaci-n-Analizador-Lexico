@@ -1,4 +1,4 @@
-void main() {
+main() {
     int edad;
     float promedio;
     edad = 20;

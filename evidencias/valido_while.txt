@@ -8,119 +8,109 @@ SECUENCIA DE TOKENS (ANÁLISIS LÉXICO)
 ------------------------------------------------------------------------------
 #    LEXEMA                  TOKEN           LINEA
 ------------------------------------------------------------------------------
-1    void                    VOID            1
-2    main                    MAIN            1
-3    (                       (               1
-4    )                       )               1
-5    {                       {               1
-6    int                     INT             2
-7    contador                ID              2
-8    ;                       ;               2
-9    int                     INT             3
-10   suma                    ID              3
-11   ;                       ;               3
-12   contador                ID              4
-13   =                       =               4
-14   0                       NUM_INT         4
-15   ;                       ;               4
-16   suma                    ID              5
-17   =                       =               5
-18   0                       NUM_INT         5
-19   ;                       ;               5
-20   while                   WHILE           6
-21   (                       (               6
-22   contador                ID              6
-23   <                       COMP            6
-24   10                      NUM_INT         6
-25   )                       )               6
-26   {                       {               6
-27   suma                    ID              7
-28   =                       =               7
-29   suma                    ID              7
-30   +                       +               7
-31   contador                ID              7
-32   ;                       ;               7
-33   contador                ID              8
-34   =                       =               8
-35   contador                ID              8
-36   +                       +               8
-37   1                       NUM_INT         8
-38   ;                       ;               8
-39   }                       }               9
-40   println                 PRINTLN         10
-41   (                       (               10
-42   suma                    ID              10
-43   )                       )               10
-44   ;                       ;               10
-45   }                       }               11
+1    main                    MAIN            1
+2    (                       (               1
+3    )                       )               1
+4    {                       {               1
+5    int                     INT             2
+6    contador                ID              2
+7    ;                       ;               2
+8    int                     INT             3
+9    suma                    ID              3
+10   ;                       ;               3
+11   contador                ID              4
+12   =                       =               4
+13   0                       NUM_INT         4
+14   ;                       ;               4
+15   suma                    ID              5
+16   =                       =               5
+17   0                       NUM_INT         5
+18   ;                       ;               5
+19   while                   WHILE           6
+20   (                       (               6
+21   contador                ID              6
+22   <                       COMP            6
+23   10                      NUM_INT         6
+24   )                       )               6
+25   {                       {               6
+26   suma                    ID              7
+27   =                       =               7
+28   suma                    ID              7
+29   +                       +               7
+30   contador                ID              7
+31   ;                       ;               7
+32   contador                ID              8
+33   =                       =               8
+34   contador                ID              8
+35   +                       +               8
+36   1                       NUM_INT         8
+37   ;                       ;               8
+38   }                       }               9
+39   println                 PRINTLN         10
+40   (                       (               10
+41   suma                    ID              10
+42   )                       )               10
+43   ;                       ;               10
+44   }                       }               11
 ------------------------------------------------------------------------------
-Total: 45 tokens
+Total: 44 tokens
 
 TRAZA DE RECONOCIMIENTO SINTÁCTICO
 ------------------------------------------------------------------------------
 PROGRAMA
   LISTA_FUNCIONES
   PRINCIPAL
-    TIPO_RETORNO: void
     main ( )
     BLOQUE
       LISTA_VARIABLES
         DECLARACION
           TIPO
             TIPO_BASE: int
-          LISTA_VARIABLES
-            LISTA_ID
-              ID: contador (int)
-            PUNTO_COMA: ;
+          LISTA_ID
+            id: contador (int)
+          PUNTO_COMA: ;
         DECLARACION
           TIPO
             TIPO_BASE: int
-          LISTA_VARIABLES
-            LISTA_ID
-              ID: suma (int)
-            PUNTO_COMA: ;
+          LISTA_ID
+            id: suma (int)
+          PUNTO_COMA: ;
       COMANDOS
         ASIGNACION
-          OBJETIVO: contador
+          id: contador
           ASIGNACION: =
           COMPLEMENTO
-            EXPRESION: 0
+            COMPLEMENTO: 0
           PUNTO_COMA: ;
         ASIGNACION
-          OBJETIVO: suma
+          id: suma
           ASIGNACION: =
           COMPLEMENTO
-            EXPRESION: 0
+            COMPLEMENTO: 0
           PUNTO_COMA: ;
-        WHILE
-          COMPLEMENTO
-            ID: contador
-            EXPRESION: contador < 10
+        MIENTRAS
+          id: contador
           BLOQUE
             LISTA_VARIABLES
             COMANDOS
               ASIGNACION
-                OBJETIVO: suma
+                id: suma
                 ASIGNACION: =
                 COMPLEMENTO
-                  ID: suma
-                  ID: contador
-                  EXPRESION: suma + contador
+                  id: suma
+                  id: contador
+                  COMPLEMENTO: suma + contador
                 PUNTO_COMA: ;
               ASIGNACION
-                OBJETIVO: contador
+                id: contador
                 ASIGNACION: =
                 COMPLEMENTO
-                  ID: contador
-                  EXPRESION: contador + 1
+                  id: contador
+                  COMPLEMENTO: contador + 1
                 PUNTO_COMA: ;
             BLOQUE: cierre '}' en la línea 9
-        LLAMADA
-          ID: println
-          ARGUMENTOS
-            COMPLEMENTO
-              ID: suma
-              EXPRESION: suma
+        ESCRITURA
+          id: suma
           PUNTO_COMA: ;
       BLOQUE: cierre '}' en la línea 11
 

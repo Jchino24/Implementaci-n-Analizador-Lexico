@@ -1,4 +1,5 @@
-void main() {
-    int notas[10;
-    notas[0] = 1;
+main() {
+    int[10 notas;
+    int x;
+    x = 1;
 }

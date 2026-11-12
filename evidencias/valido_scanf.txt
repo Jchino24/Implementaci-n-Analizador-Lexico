@@ -8,92 +8,72 @@ SECUENCIA DE TOKENS (ANÁLISIS LÉXICO)
 ------------------------------------------------------------------------------
 #    LEXEMA                  TOKEN           LINEA
 ------------------------------------------------------------------------------
-1    void                    VOID            1
-2    main                    MAIN            1
-3    (                       (               1
-4    )                       )               1
-5    {                       {               1
-6    int                     INT             2
-7    edad                    ID              2
-8    ;                       ;               2
-9    float                   FLOAT           3
-10   nota                    ID              3
-11   ;                       ;               3
-12   scanf                   SCANF           4
-13   (                       (               4
-14   edad                    ID              4
-15   )                       )               4
-16   ;                       ;               4
-17   scanf                   SCANF           5
-18   (                       (               5
-19   nota                    ID              5
-20   )                       )               5
-21   ;                       ;               5
-22   println                 PRINTLN         6
-23   (                       (               6
-24   edad                    ID              6
-25   )                       )               6
-26   ;                       ;               6
-27   println                 PRINTLN         7
-28   (                       (               7
-29   nota                    ID              7
-30   )                       )               7
-31   ;                       ;               7
-32   }                       }               8
+1    main                    MAIN            1
+2    (                       (               1
+3    )                       )               1
+4    {                       {               1
+5    int                     INT             2
+6    edad                    ID              2
+7    ;                       ;               2
+8    float                   FLOAT           3
+9    nota                    ID              3
+10   ;                       ;               3
+11   scanf                   SCANF           4
+12   (                       (               4
+13   edad                    ID              4
+14   )                       )               4
+15   ;                       ;               4
+16   scanf                   SCANF           5
+17   (                       (               5
+18   nota                    ID              5
+19   )                       )               5
+20   ;                       ;               5
+21   println                 PRINTLN         6
+22   (                       (               6
+23   edad                    ID              6
+24   )                       )               6
+25   ;                       ;               6
+26   println                 PRINTLN         7
+27   (                       (               7
+28   nota                    ID              7
+29   )                       )               7
+30   ;                       ;               7
+31   }                       }               8
 ------------------------------------------------------------------------------
-Total: 32 tokens
+Total: 31 tokens
 
 TRAZA DE RECONOCIMIENTO SINTÁCTICO
 ------------------------------------------------------------------------------
 PROGRAMA
   LISTA_FUNCIONES
   PRINCIPAL
-    TIPO_RETORNO: void
     main ( )
     BLOQUE
       LISTA_VARIABLES
         DECLARACION
           TIPO
             TIPO_BASE: int
-          LISTA_VARIABLES
-            LISTA_ID
-              ID: edad (int)
-            PUNTO_COMA: ;
+          LISTA_ID
+            id: edad (int)
+          PUNTO_COMA: ;
         DECLARACION
           TIPO
             TIPO_BASE: float
-          LISTA_VARIABLES
-            LISTA_ID
-              ID: nota (float)
-            PUNTO_COMA: ;
+          LISTA_ID
+            id: nota (float)
+          PUNTO_COMA: ;
       COMANDOS
-        LLAMADA
-          ID: scanf
-          ARGUMENTOS
-            COMPLEMENTO
-              ID: edad
-              EXPRESION: edad
+        LECTURA
+          id: edad
           PUNTO_COMA: ;
-        LLAMADA
-          ID: scanf
-          ARGUMENTOS
-            COMPLEMENTO
-              ID: nota
-              EXPRESION: nota
+        LECTURA
+          id: nota
           PUNTO_COMA: ;
-        LLAMADA
-          ID: println
-          ARGUMENTOS
-            COMPLEMENTO
-              ID: edad
-              EXPRESION: edad
+        ESCRITURA
+          id: edad
           PUNTO_COMA: ;
-        LLAMADA
-          ID: println
-          ARGUMENTOS
-            COMPLEMENTO
-              ID: nota
-              EXPRESION: nota
+        ESCRITURA
+          id: nota
           PUNTO_COMA: ;
       BLOQUE: cierre '}' en la línea 8
 

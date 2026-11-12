@@ -8,7 +8,7 @@ float promedio(float a, float b) {
     return (a + b) / 2;
 }
 
-void main() {
+main() {
     int x;
     float p;
     x = func suma(4, 6);

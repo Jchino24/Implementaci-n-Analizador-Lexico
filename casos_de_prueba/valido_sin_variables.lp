@@ -1,4 +1,4 @@
-void main() {
+main() {
     println("inicio");
     if (1 < 2) {
         println("ok");

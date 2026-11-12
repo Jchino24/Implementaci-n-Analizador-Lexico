@@ -1,4 +1,4 @@
-void main() {
+main() {
     int a;
     int b;
     int c;
@@ -11,4 +11,5 @@ void main() {
     r = !0 && (a < b) || (c >= 4);
     r = -a + b;
     r = a == b || a != c && !0;
+    r = +a;
 }

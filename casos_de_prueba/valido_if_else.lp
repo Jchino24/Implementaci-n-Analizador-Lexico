@@ -1,4 +1,4 @@
-void main() {
+main() {
     int edad;
     int categoria;
     edad = 20;
@@ -9,9 +9,11 @@ void main() {
     }
     if (categoria == 1 && edad < 65) {
         println("adulto");
-    } else if (edad >= 65) {
-        println("adulto mayor");
     } else {
-        println("menor");
+        if (edad >= 65) {
+            println("adulto mayor");
+        } else {
+            println("menor");
+        }
     }
 }

@@ -16,54 +16,51 @@ SECUENCIA DE TOKENS (ANÁLISIS LÉXICO)
 6    return                  RETURN          2
 7    1                       NUM_INT         2
 8    }                       }               3
-9    void                    VOID            5
-10   main                    MAIN            5
-11   (                       (               5
-12   )                       )               5
-13   {                       {               5
-14   int                     INT             6
-15   x                       ID              6
-16   ;                       ;               6
-17   x                       ID              7
-18   =                       =               7
-19   1                       NUM_INT         7
-20   ;                       ;               7
-21   }                       }               8
+9    main                    MAIN            5
+10   (                       (               5
+11   )                       )               5
+12   {                       {               5
+13   int                     INT             6
+14   x                       ID              6
+15   ;                       ;               6
+16   x                       ID              7
+17   =                       =               7
+18   1                       NUM_INT         7
+19   ;                       ;               7
+20   }                       }               8
 ------------------------------------------------------------------------------
-Total: 21 tokens
+Total: 20 tokens
 
 TRAZA DE RECONOCIMIENTO SINTÁCTICO
 ------------------------------------------------------------------------------
 PROGRAMA
   LISTA_FUNCIONES
-    FUNCION
-      TIPO_RETORNO: int
-      ID: f
+    DECLARACION_FUNCION
+      TIPO_RETORNO
+        TIPO
+          TIPO_BASE: int
+      id: f
       BLOQUE
         LISTA_VARIABLES
         COMANDOS
-          RETURN
-            COMPLEMENTO
-              EXPRESION: 1
+          RETORNO
         BLOQUE: cierre '}' en la línea 3
   PRINCIPAL
-    TIPO_RETORNO: void
     main ( )
     BLOQUE
       LISTA_VARIABLES
         DECLARACION
           TIPO
             TIPO_BASE: int
-          LISTA_VARIABLES
-            LISTA_ID
-              ID: x (int)
-            PUNTO_COMA: ;
+          LISTA_ID
+            id: x (int)
+          PUNTO_COMA: ;
       COMANDOS
         ASIGNACION
-          OBJETIVO: x
+          id: x
           ASIGNACION: =
           COMPLEMENTO
-            EXPRESION: 1
+            COMPLEMENTO: 1
           PUNTO_COMA: ;
       BLOQUE: cierre '}' en la línea 8
 
@@ -75,7 +72,7 @@ TABLA DE SÍMBOLOS (VARIABLES DECLARADAS)
 
 DIAGNÓSTICO
 ------------------------------------------------------------------------------
-[ERROR SINTACTICO] Línea 3: se esperaba ';' al final de la sentencia RETURN, pero se encontró '}'
+[ERROR SINTACTICO] Línea 3: se esperaba ';' al final de la sentencia RETORNO, pero se encontró '}'
       3 | }
         | ^
         Sugerencia: Falta ';' al final de la sentencia de la línea 2.

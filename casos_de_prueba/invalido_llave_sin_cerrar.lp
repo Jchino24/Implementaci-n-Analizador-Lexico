@@ -1,3 +1,3 @@
-void main() {
+main() {
     int edad;
     edad = 20;

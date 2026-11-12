@@ -1,4 +1,4 @@
-void main() {
+main() {
     int contador;
     int suma;
     contador = 0;

@@ -1,4 +1,4 @@
-void main() {
+main() {
     int i;
     int total;
     i = 0;

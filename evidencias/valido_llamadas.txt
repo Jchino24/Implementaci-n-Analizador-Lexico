@@ -32,64 +32,58 @@ SECUENCIA DE TOKENS (ANÁLISIS LÉXICO)
 22   2                       NUM_INT         6
 23   ;                       ;               6
 24   }                       }               7
-25   void                    VOID            9
-26   main                    MAIN            9
-27   (                       (               9
-28   )                       )               9
-29   {                       {               9
-30   int                     INT             10
-31   valor                   ID              10
-32   ;                       ;               10
-33   valor                   ID              11
-34   =                       =               11
-35   5                       NUM_INT         11
-36   ;                       ;               11
-37   func                    FUNC            12
-38   saludar                 ID              12
-39   (                       (               12
-40   )                       )               12
-41   ;                       ;               12
-42   valor                   ID              13
-43   =                       =               13
-44   func                    FUNC            13
-45   duplicar                ID              13
-46   (                       (               13
-47   valor                   ID              13
-48   )                       )               13
-49   ;                       ;               13
-50   println                 PRINTLN         14
-51   (                       (               14
-52   func                    FUNC            14
-53   duplicar                ID              14
-54   (                       (               14
-55   valor                   ID              14
-56   )                       )               14
-57   )                       )               14
-58   ;                       ;               14
-59   }                       }               15
+25   main                    MAIN            9
+26   (                       (               9
+27   )                       )               9
+28   {                       {               9
+29   int                     INT             10
+30   valor                   ID              10
+31   ;                       ;               10
+32   valor                   ID              11
+33   =                       =               11
+34   5                       NUM_INT         11
+35   ;                       ;               11
+36   func                    FUNC            12
+37   saludar                 ID              12
+38   (                       (               12
+39   )                       )               12
+40   valor                   ID              13
+41   =                       =               13
+42   func                    FUNC            13
+43   duplicar                ID              13
+44   (                       (               13
+45   valor                   ID              13
+46   )                       )               13
+47   ;                       ;               13
+48   println                 PRINTLN         14
+49   (                       (               14
+50   valor                   ID              14
+51   )                       )               14
+52   ;                       ;               14
+53   }                       }               15
 ------------------------------------------------------------------------------
-Total: 59 tokens
+Total: 53 tokens
 
 TRAZA DE RECONOCIMIENTO SINTÁCTICO
 ------------------------------------------------------------------------------
 PROGRAMA
   LISTA_FUNCIONES
-    FUNCION
-      TIPO_RETORNO: void
-      ID: saludar
+    DECLARACION_FUNCION
+      TIPO_RETORNO
+        void
+      id: saludar
       BLOQUE
         LISTA_VARIABLES
         COMANDOS
-          LLAMADA
-            ID: println
-            ARGUMENTOS
-              COMPLEMENTO
-                EXPRESION: hola
+          ESCRITURA
+            constante/texto: hola
             PUNTO_COMA: ;
         BLOQUE: cierre '}' en la línea 3
-    FUNCION
-      TIPO_RETORNO: int
-      ID: duplicar
+    DECLARACION_FUNCION
+      TIPO_RETORNO
+        TIPO
+          TIPO_BASE: int
+      id: duplicar
       PARAMETROS
         TIPO
           TIPO_BASE: int
@@ -97,57 +91,41 @@ PROGRAMA
       BLOQUE
         LISTA_VARIABLES
         COMANDOS
-          RETURN
-            COMPLEMENTO
-              ID: n
-              EXPRESION: n * 2
+          RETORNO
+            id: n
             PUNTO_COMA: ;
         BLOQUE: cierre '}' en la línea 7
   PRINCIPAL
-    TIPO_RETORNO: void
     main ( )
     BLOQUE
       LISTA_VARIABLES
         DECLARACION
           TIPO
             TIPO_BASE: int
-          LISTA_VARIABLES
-            LISTA_ID
-              ID: valor (int)
-            PUNTO_COMA: ;
+          LISTA_ID
+            id: valor (int)
+          PUNTO_COMA: ;
       COMANDOS
         ASIGNACION
-          OBJETIVO: valor
+          id: valor
           ASIGNACION: =
           COMPLEMENTO
-            EXPRESION: 5
+            COMPLEMENTO: 5
           PUNTO_COMA: ;
-        LLAMADA
-          ID: saludar
-          PUNTO_COMA: ;
+        FUNCION
+          id: saludar
         ASIGNACION
-          OBJETIVO: valor
+          id: valor
           ASIGNACION: =
           COMPLEMENTO
-            LLAMADA
-              ID: duplicar
+            FUNCION
+              id: duplicar
               ARGUMENTOS
-                COMPLEMENTO
-                  ID: valor
-                  EXPRESION: valor
-            EXPRESION: func duplicar ( valor )
+                id: valor
+            COMPLEMENTO: func duplicar ( valor )
           PUNTO_COMA: ;
-        LLAMADA
-          ID: println
-          ARGUMENTOS
-            COMPLEMENTO
-              LLAMADA
-                ID: duplicar
-                ARGUMENTOS
-                  COMPLEMENTO
-                    ID: valor
-                    EXPRESION: valor
-              EXPRESION: func duplicar ( valor )
+        ESCRITURA
+          id: valor
           PUNTO_COMA: ;
       BLOQUE: cierre '}' en la línea 15
 

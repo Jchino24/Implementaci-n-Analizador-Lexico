@@ -2,7 +2,7 @@ int f() {
     return 1
 }
 
-void main() {
+main() {
     int x;
     x = 1;
 }

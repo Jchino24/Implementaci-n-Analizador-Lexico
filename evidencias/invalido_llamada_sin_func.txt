@@ -8,25 +8,23 @@ SECUENCIA DE TOKENS (ANÁLISIS LÉXICO)
 ------------------------------------------------------------------------------
 #    LEXEMA                  TOKEN           LINEA
 ------------------------------------------------------------------------------
-1    void                    VOID            1
-2    main                    MAIN            1
-3    (                       (               1
-4    )                       )               1
-5    {                       {               1
-6    saludar                 ID              2
-7    (                       (               2
-8    )                       )               2
-9    ;                       ;               2
-10   }                       }               3
+1    main                    MAIN            1
+2    (                       (               1
+3    )                       )               1
+4    {                       {               1
+5    saludar                 ID              2
+6    (                       (               2
+7    )                       )               2
+8    ;                       ;               2
+9    }                       }               3
 ------------------------------------------------------------------------------
-Total: 10 tokens
+Total: 9 tokens
 
 TRAZA DE RECONOCIMIENTO SINTÁCTICO
 ------------------------------------------------------------------------------
 PROGRAMA
   LISTA_FUNCIONES
   PRINCIPAL
-    TIPO_RETORNO: void
     main ( )
     BLOQUE
       LISTA_VARIABLES
@@ -42,7 +40,7 @@ DIAGNÓSTICO
 [ERROR SINTACTICO] Línea 2: las llamadas a función deben comenzar con 'func'; se encontró 'saludar'
       2 |     saludar();
         |     ^
-        Sugerencia: Ejemplo: func nombre(argumentos);
+        Sugerencia: Ejemplo: func nombre(argumentos)
 
 RESULTADO
 ------------------------------------------------------------------------------

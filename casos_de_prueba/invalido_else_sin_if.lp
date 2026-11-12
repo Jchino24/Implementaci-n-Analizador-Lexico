@@ -1,4 +1,4 @@
-void main() {
+main() {
     else {
         println("x");
     }

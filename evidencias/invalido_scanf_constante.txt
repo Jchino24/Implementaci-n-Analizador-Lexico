@@ -1,0 +1,60 @@
+==============================================================================
+ ANALIZADOR LÉXICO Y SINTÁCTICO - LENGUAJE LP
+ Proyecto integrador: parser con descenso recursivo
+==============================================================================
+Archivo: casos_de_prueba/invalido_scanf_constante.lp
+
+SECUENCIA DE TOKENS (ANÁLISIS LÉXICO)
+------------------------------------------------------------------------------
+#    LEXEMA                  TOKEN           LINEA
+------------------------------------------------------------------------------
+1    main                    MAIN            1
+2    (                       (               1
+3    )                       )               1
+4    {                       {               1
+5    scanf                   SCANF           2
+6    (                       (               2
+7    1                       NUM_INT         2
+8    )                       )               2
+9    ;                       ;               2
+10   }                       }               3
+------------------------------------------------------------------------------
+Total: 10 tokens
+
+TRAZA DE RECONOCIMIENTO SINTÁCTICO
+------------------------------------------------------------------------------
+PROGRAMA
+  LISTA_FUNCIONES
+  PRINCIPAL
+    main ( )
+    BLOQUE
+      LISTA_VARIABLES
+      COMANDOS
+        LECTURA
+          PUNTO_COMA: ;
+      BLOQUE: cierre '}' en la línea 3
+
+TABLA DE SÍMBOLOS (VARIABLES DECLARADAS)
+------------------------------------------------------------------------------
+(no se registraron declaraciones)
+
+DIAGNÓSTICO
+------------------------------------------------------------------------------
+[ERROR SINTACTICO] Línea 2: se esperaba un identificador de variable en TERMINO_LECTURA, pero se encontró '1' (NUM_INT)
+      2 |     scanf(1);
+        |           ^
+        Sugerencia: scanf solo admite variables: scanf(edad);
+
+[ERROR SINTACTICO] Línea 2: se esperaba ')' para cerrar 'scanf' en LECTURA, pero se encontró '1' (NUM_INT)
+      2 |     scanf(1);
+        |           ^
+
+RESULTADO
+------------------------------------------------------------------------------
+Funciones reconocidas:          0
+Declaraciones reconocidas:      0
+Asignaciones reconocidas:       0
+Errores léxicos:               0
+Errores sintácticos:           2
+==============================================================================
+RESULTADO FINAL: PROGRAMA CON ERRORES

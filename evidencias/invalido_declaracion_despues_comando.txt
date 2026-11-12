@@ -8,55 +8,51 @@ SECUENCIA DE TOKENS (ANÁLISIS LÉXICO)
 ------------------------------------------------------------------------------
 #    LEXEMA                  TOKEN           LINEA
 ------------------------------------------------------------------------------
-1    void                    VOID            1
-2    main                    MAIN            1
-3    (                       (               1
-4    )                       )               1
-5    {                       {               1
-6    int                     INT             2
-7    a                       ID              2
-8    ;                       ;               2
-9    a                       ID              3
-10   =                       =               3
-11   1                       NUM_INT         3
-12   ;                       ;               3
-13   int                     INT             4
-14   b                       ID              4
-15   ;                       ;               4
-16   }                       }               5
+1    main                    MAIN            1
+2    (                       (               1
+3    )                       )               1
+4    {                       {               1
+5    int                     INT             2
+6    a                       ID              2
+7    ;                       ;               2
+8    a                       ID              3
+9    =                       =               3
+10   1                       NUM_INT         3
+11   ;                       ;               3
+12   int                     INT             4
+13   b                       ID              4
+14   ;                       ;               4
+15   }                       }               5
 ------------------------------------------------------------------------------
-Total: 16 tokens
+Total: 15 tokens
 
 TRAZA DE RECONOCIMIENTO SINTÁCTICO
 ------------------------------------------------------------------------------
 PROGRAMA
   LISTA_FUNCIONES
   PRINCIPAL
-    TIPO_RETORNO: void
     main ( )
     BLOQUE
       LISTA_VARIABLES
         DECLARACION
           TIPO
             TIPO_BASE: int
-          LISTA_VARIABLES
-            LISTA_ID
-              ID: a (int)
-            PUNTO_COMA: ;
+          LISTA_ID
+            id: a (int)
+          PUNTO_COMA: ;
       COMANDOS
         ASIGNACION
-          OBJETIVO: a
+          id: a
           ASIGNACION: =
           COMPLEMENTO
-            EXPRESION: 1
+            COMPLEMENTO: 1
           PUNTO_COMA: ;
         DECLARACION
           TIPO
             TIPO_BASE: int
-          LISTA_VARIABLES
-            LISTA_ID
-              ID: b (int)
-            PUNTO_COMA: ;
+          LISTA_ID
+            id: b (int)
+          PUNTO_COMA: ;
       BLOQUE: cierre '}' en la línea 5
 
 TABLA DE SÍMBOLOS (VARIABLES DECLARADAS)
@@ -71,7 +67,7 @@ DIAGNÓSTICO
 [ERROR SINTACTICO] Línea 4: las variables deben declararse antes de los comandos
       4 |     int b;
         |     ^
-        Sugerencia: Mueva la declaración al inicio del bloque, antes de la primera instrucción.
+        Sugerencia: Mueva la declaración al inicio del bloque.
 
 RESULTADO
 ------------------------------------------------------------------------------
