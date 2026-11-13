@@ -26,7 +26,7 @@ fi
 
 mkdir -p "$EVIDENCIAS"
 {
-    echo "RESUMEN DE PRUEBAS - ANALIZADOR LP (PROYECTO INTEGRADOR)"
+    echo "RESUMEN DE PRUEBAS - ANALIZADOR LP (ENTREGABLE 1)"
     echo "Generado por: pruebas/ejecutar_pruebas.sh"
     echo "Fecha: $(date '+%Y-%m-%d %H:%M:%S')"
     echo "======================================================================"

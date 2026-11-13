@@ -1,18 +1,10 @@
 int suma(int a, int b) {
-    int resultado;
-    resultado = a + b;
-    return resultado;
+    int c;
+    c = a + b;
 }
 
-float promedio(float a, float b) {
-    return (a + b) / 2;
-}
-
-main() {
+void main() {
+    int[5] notas;
     int x;
-    float p;
-    x = func suma(4, 6);
-    p = func promedio(15.5, 12.25);
-    println(x);
-    println(p);
+    x = notas[0];
 }

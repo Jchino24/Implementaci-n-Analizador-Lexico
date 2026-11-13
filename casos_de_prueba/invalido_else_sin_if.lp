@@ -1,5 +1,0 @@
-main() {
-    else {
-        println("x");
-    }
-}

@@ -9,29 +9,15 @@
 
 namespace {
 
-const std::string kSeparador(78, '=');
-const std::string kSubseparador(78, '-');
-
 void imprimirUso(const std::string& programa) {
-    std::cout
-        << "Uso: " << programa << " <archivo.lp> [opciones]\n\n"
-        << "Opciones:\n"
-        << "  --sin-tokens   Omite la tabla de tokens.\n"
-        << "  --sin-traza    Omite la traza de reconocimiento sintáctico.\n"
-        << "  --sin-tabla    Omite la tabla de símbolos.\n"
-        << "  -h, --ayuda    Muestra esta ayuda.\n\n"
-        << "Ejemplo:\n"
-        << "  " << programa << " casos_de_prueba/valido_basico.lp\n\n"
-        << "Códigos de salida: 0 = programa válido, 1 = errores, "
-           "2 = error de uso o de archivo.\n";
+    std::cout << "Uso: " << programa << " <archivo.lp>\n\n"
+              << "Ejemplo:\n"
+              << "  " << programa << " casos_de_prueba/valido_basico.lp\n";
 }
 
 std::string recortar(const std::string& texto, std::size_t maximo) {
     if (texto.size() <= maximo) {
         return texto;
-    }
-    if (maximo <= 3) {
-        return texto.substr(0, maximo);
     }
     return texto.substr(0, maximo - 3) + "...";
 }
@@ -50,13 +36,8 @@ std::string expandirTabs(const std::string& linea) {
 
 int columnaVisual(const std::string& linea, int columna) {
     int visual = 0;
-    const int limite = columna - 1;
-    for (int i = 0; i < limite && i < static_cast<int>(linea.size()); ++i) {
-        if (linea[static_cast<std::size_t>(i)] == '\t') {
-            visual += 4;
-        } else {
-            ++visual;
-        }
+    for (int i = 0; i < columna - 1 && i < static_cast<int>(linea.size()); ++i) {
+        visual += linea[static_cast<std::size_t>(i)] == '\t' ? 4 : 1;
     }
     return visual;
 }
@@ -66,17 +47,17 @@ void imprimirError(const ErrorCompilacion& error,
     const std::string etiqueta =
         error.tipo == TipoError::LEXICO ? "[ERROR LEXICO]" : "[ERROR SINTACTICO]";
 
-    std::cout << etiqueta << " Línea " << error.linea << ": " << error.mensaje
-              << "\n";
+    std::cout << etiqueta << " Línea " << error.linea << ": "
+              << error.mensaje << "\n";
 
     if (error.linea >= 1 &&
         error.linea <= static_cast<int>(lineas.size())) {
-        const std::string& lineaOriginal =
+        const std::string& original =
             lineas[static_cast<std::size_t>(error.linea - 1)];
         std::cout << "   " << std::right << std::setw(4) << error.linea
-                  << " | " << expandirTabs(lineaOriginal) << "\n";
+                  << " | " << expandirTabs(original) << "\n";
         std::cout << "        | "
-                  << std::string(columnaVisual(lineaOriginal, error.columna), ' ')
+                  << std::string(columnaVisual(original, error.columna), ' ')
                   << "^\n";
     }
 
@@ -87,11 +68,11 @@ void imprimirError(const ErrorCompilacion& error,
 }
 
 void imprimirTokens(const std::vector<Token>& tokens) {
-    std::cout << "SECUENCIA DE TOKENS (ANÁLISIS LÉXICO)\n";
-    std::cout << kSubseparador << "\n";
+    std::cout << "SECUENCIA DE TOKENS\n";
+    std::cout << std::string(60, '-') << "\n";
     std::cout << std::left << std::setw(5) << "#" << std::setw(24) << "LEXEMA"
               << std::setw(16) << "TOKEN" << "LINEA\n";
-    std::cout << kSubseparador << "\n";
+    std::cout << std::string(60, '-') << "\n";
 
     std::size_t numero = 0;
     for (const Token& token : tokens) {
@@ -99,55 +80,13 @@ void imprimirTokens(const std::vector<Token>& tokens) {
             continue;
         }
         ++numero;
-
-        std::string lexema = token.lexema;
-        if (lexema.empty()) {
-            lexema = "<vacio>";
-        }
-
+        std::string lexema = token.lexema.empty() ? "<vacio>" : token.lexema;
         std::cout << std::left << std::setw(5) << numero << std::setw(24)
                   << recortar(lexema, 22) << std::setw(16)
                   << tokenTypeToString(token.tipo) << token.linea << "\n";
     }
-
-    std::cout << kSubseparador << "\n";
+    std::cout << std::string(60, '-') << "\n";
     std::cout << "Total: " << numero << " tokens\n\n";
-}
-
-void imprimirTraza(const std::vector<std::string>& traza) {
-    std::cout << "TRAZA DE RECONOCIMIENTO SINTÁCTICO\n";
-    std::cout << kSubseparador << "\n";
-    if (traza.empty()) {
-        std::cout << "(sin traza)\n";
-    } else {
-        for (const std::string& linea : traza) {
-            std::cout << linea << "\n";
-        }
-    }
-    std::cout << "\n";
-}
-
-void imprimirTabla(const TablaSimbolos& tabla) {
-    std::cout << "TABLA DE SÍMBOLOS (VARIABLES DECLARADAS)\n";
-    std::cout << kSubseparador << "\n";
-
-    const std::vector<Simbolo>& simbolos = tabla.obtenerSimbolos();
-    if (simbolos.empty()) {
-        std::cout << "(no se registraron declaraciones)\n\n";
-        return;
-    }
-
-    std::cout << std::left << std::setw(5) << "#" << std::setw(20) << "NOMBRE"
-              << std::setw(20) << "TIPO" << "LINEA\n";
-    std::cout << kSubseparador << "\n";
-    std::size_t numero = 0;
-    for (const Simbolo& simbolo : simbolos) {
-        ++numero;
-        std::cout << std::left << std::setw(5) << numero << std::setw(20)
-                  << recortar(simbolo.nombre, 18) << std::setw(20)
-                  << recortar(simbolo.tipo, 18) << simbolo.linea << "\n";
-    }
-    std::cout << "\n";
 }
 
 std::string archivoPorDefecto() {
@@ -166,10 +105,7 @@ std::string archivoPorDefecto() {
 }  // namespace
 
 int main(int argc, char* argv[]) {
-    bool mostrarTokens = true;
-    bool mostrarTraza = true;
-    bool mostrarTabla = true;
-    std::vector<std::string> archivos;
+    std::string ruta;
 
     for (int i = 1; i < argc; ++i) {
         const std::string argumento = argv[i];
@@ -177,28 +113,22 @@ int main(int argc, char* argv[]) {
             imprimirUso(argv[0]);
             return 0;
         }
-        if (argumento == "--sin-tokens") {
-            mostrarTokens = false;
-        } else if (argumento == "--sin-traza") {
-            mostrarTraza = false;
-        } else if (argumento == "--sin-tabla") {
-            mostrarTabla = false;
-        } else if (!argumento.empty() && argumento[0] == '-') {
+        if (!argumento.empty() && argumento[0] == '-') {
             std::cerr << "Opción desconocida: " << argumento << "\n\n";
             imprimirUso(argv[0]);
             return 2;
-        } else {
-            archivos.push_back(argumento);
         }
+        if (!ruta.empty()) {
+            std::cerr << "Error: solo se puede analizar un archivo .lp.\n\n";
+            imprimirUso(argv[0]);
+            return 2;
+        }
+        ruta = argumento;
     }
 
-    if (archivos.size() > 1) {
-        std::cerr << "Error: solo se puede analizar un archivo .lp a la vez.\n\n";
-        imprimirUso(argv[0]);
-        return 2;
+    if (ruta.empty()) {
+        ruta = archivoPorDefecto();
     }
-
-    std::string ruta = archivos.empty() ? archivoPorDefecto() : archivos.front();
     if (ruta.empty()) {
         std::cerr << "Error: no se indicó un archivo .lp.\n\n";
         imprimirUso(argv[0]);
@@ -211,51 +141,27 @@ int main(int argc, char* argv[]) {
         return 2;
     }
 
-    std::cout << kSeparador << "\n";
+    std::cout << std::string(60, '=') << "\n";
     std::cout << " ANALIZADOR LÉXICO Y SINTÁCTICO - LENGUAJE LP\n";
-    std::cout << " Proyecto integrador: parser con descenso recursivo\n";
-    std::cout << kSeparador << "\n";
+    std::cout << " Entregable 1: estructura, declaraciones y asignaciones\n";
+    std::cout << std::string(60, '=') << "\n";
     std::cout << "Archivo: " << ruta << "\n\n";
 
     const bool exito = parser.analizar();
 
-    if (mostrarTokens) {
-        imprimirTokens(parser.obtenerTokens());
-    }
-    if (mostrarTraza) {
-        imprimirTraza(parser.obtenerTraza());
-    }
-    if (mostrarTabla) {
-        imprimirTabla(parser.obtenerTablaSimbolos());
-    }
+    imprimirTokens(parser.obtenerTokens());
 
     std::cout << "DIAGNÓSTICO\n";
-    std::cout << kSubseparador << "\n";
-
-    const std::vector<ErrorCompilacion>& errores = parser.obtenerErrores();
-
-    if (errores.empty()) {
+    std::cout << std::string(60, '-') << "\n";
+    if (parser.obtenerErrores().empty()) {
         std::cout << "Sin errores sintácticos.\n\n";
     } else {
-        for (const ErrorCompilacion& error : errores) {
+        for (const ErrorCompilacion& error : parser.obtenerErrores()) {
             imprimirError(error, parser.obtenerLineas());
         }
     }
 
-    std::cout << "RESULTADO\n";
-    std::cout << kSubseparador << "\n";
-    std::cout << std::left << std::setw(32) << "Funciones reconocidas:"
-              << parser.totalFunciones() << "\n";
-    std::cout << std::left << std::setw(32) << "Declaraciones reconocidas:"
-              << parser.totalDeclaraciones() << "\n";
-    std::cout << std::left << std::setw(32) << "Asignaciones reconocidas:"
-              << parser.totalAsignaciones() << "\n";
-    std::cout << std::left << std::setw(32) << "Errores léxicos:"
-              << parser.totalErroresLexicos() << "\n";
-    std::cout << std::left << std::setw(32) << "Errores sintácticos:"
-              << parser.totalErroresSintacticos() << "\n";
-    std::cout << kSeparador << "\n";
-
+    std::cout << std::string(60, '=') << "\n";
     if (exito) {
         std::cout << "RESULTADO FINAL: PROGRAMA VÁLIDO\n";
         return 0;

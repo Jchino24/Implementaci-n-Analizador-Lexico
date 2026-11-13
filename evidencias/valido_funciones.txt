@@ -1,13 +1,13 @@
-==============================================================================
+============================================================
  ANALIZADOR LÉXICO Y SINTÁCTICO - LENGUAJE LP
- Proyecto integrador: parser con descenso recursivo
-==============================================================================
+ Entregable 1: estructura, declaraciones y asignaciones
+============================================================
 Archivo: casos_de_prueba/valido_funciones.lp
 
-SECUENCIA DE TOKENS (ANÁLISIS LÉXICO)
-------------------------------------------------------------------------------
+SECUENCIA DE TOKENS
+------------------------------------------------------------
 #    LEXEMA                  TOKEN           LINEA
-------------------------------------------------------------------------------
+------------------------------------------------------------
 1    int                     INT             1
 2    suma                    ID              1
 3    (                       (               1
@@ -19,200 +19,43 @@ SECUENCIA DE TOKENS (ANÁLISIS LÉXICO)
 9    )                       )               1
 10   {                       {               1
 11   int                     INT             2
-12   resultado               ID              2
+12   c                       ID              2
 13   ;                       ;               2
-14   resultado               ID              3
+14   c                       ID              3
 15   =                       =               3
 16   a                       ID              3
 17   +                       +               3
 18   b                       ID              3
 19   ;                       ;               3
-20   return                  RETURN          4
-21   resultado               ID              4
-22   ;                       ;               4
-23   }                       }               5
-24   float                   FLOAT           7
-25   promedio                ID              7
-26   (                       (               7
-27   float                   FLOAT           7
-28   a                       ID              7
-29   ,                       ,               7
-30   float                   FLOAT           7
-31   b                       ID              7
-32   )                       )               7
-33   {                       {               7
-34   return                  RETURN          8
-35   (                       (               8
-36   a                       ID              8
-37   +                       +               8
-38   b                       ID              8
-39   )                       )               8
-40   /                       /               8
-41   2                       NUM_INT         8
-42   ;                       ;               8
-43   }                       }               9
-44   main                    MAIN            11
-45   (                       (               11
-46   )                       )               11
-47   {                       {               11
-48   int                     INT             12
-49   x                       ID              12
-50   ;                       ;               12
-51   float                   FLOAT           13
-52   p                       ID              13
-53   ;                       ;               13
-54   x                       ID              14
-55   =                       =               14
-56   func                    FUNC            14
-57   suma                    ID              14
-58   (                       (               14
-59   4                       NUM_INT         14
-60   ,                       ,               14
-61   6                       NUM_INT         14
-62   )                       )               14
-63   ;                       ;               14
-64   p                       ID              15
-65   =                       =               15
-66   func                    FUNC            15
-67   promedio                ID              15
-68   (                       (               15
-69   15.5                    NUM_DEC         15
-70   ,                       ,               15
-71   12.25                   NUM_DEC         15
-72   )                       )               15
-73   ;                       ;               15
-74   println                 PRINTLN         16
-75   (                       (               16
-76   x                       ID              16
-77   )                       )               16
-78   ;                       ;               16
-79   println                 PRINTLN         17
-80   (                       (               17
-81   p                       ID              17
-82   )                       )               17
-83   ;                       ;               17
-84   }                       }               18
-------------------------------------------------------------------------------
-Total: 84 tokens
-
-TRAZA DE RECONOCIMIENTO SINTÁCTICO
-------------------------------------------------------------------------------
-PROGRAMA
-  LISTA_FUNCIONES
-    DECLARACION_FUNCION
-      TIPO_RETORNO
-        TIPO
-          TIPO_BASE: int
-      id: suma
-      PARAMETROS
-        TIPO
-          TIPO_BASE: int
-        PARAMETRO: a (int)
-        TIPO
-          TIPO_BASE: int
-        PARAMETRO: b (int)
-      BLOQUE
-        LISTA_VARIABLES
-          DECLARACION
-            TIPO
-              TIPO_BASE: int
-            LISTA_ID
-              id: resultado (int)
-            PUNTO_COMA: ;
-        COMANDOS
-          ASIGNACION
-            id: resultado
-            ASIGNACION: =
-            COMPLEMENTO
-              id: a
-              id: b
-              COMPLEMENTO: a + b
-            PUNTO_COMA: ;
-          RETORNO
-            id: resultado
-            PUNTO_COMA: ;
-        BLOQUE: cierre '}' en la línea 5
-    DECLARACION_FUNCION
-      TIPO_RETORNO
-        TIPO
-          TIPO_BASE: float
-      id: promedio
-      PARAMETROS
-        TIPO
-          TIPO_BASE: float
-        PARAMETRO: a (float)
-        TIPO
-          TIPO_BASE: float
-        PARAMETRO: b (float)
-      BLOQUE
-        LISTA_VARIABLES
-        COMANDOS
-          RETORNO
-            id: a
-            id: b
-            PUNTO_COMA: ;
-        BLOQUE: cierre '}' en la línea 9
-  PRINCIPAL
-    main ( )
-    BLOQUE
-      LISTA_VARIABLES
-        DECLARACION
-          TIPO
-            TIPO_BASE: int
-          LISTA_ID
-            id: x (int)
-          PUNTO_COMA: ;
-        DECLARACION
-          TIPO
-            TIPO_BASE: float
-          LISTA_ID
-            id: p (float)
-          PUNTO_COMA: ;
-      COMANDOS
-        ASIGNACION
-          id: x
-          ASIGNACION: =
-          COMPLEMENTO
-            FUNCION
-              id: suma
-              ARGUMENTOS
-            COMPLEMENTO: func suma ( 4 , 6 )
-          PUNTO_COMA: ;
-        ASIGNACION
-          id: p
-          ASIGNACION: =
-          COMPLEMENTO
-            FUNCION
-              id: promedio
-              ARGUMENTOS
-            COMPLEMENTO: func promedio ( 15.5 , 12.25 )
-          PUNTO_COMA: ;
-        ESCRITURA
-          id: x
-          PUNTO_COMA: ;
-        ESCRITURA
-          id: p
-          PUNTO_COMA: ;
-      BLOQUE: cierre '}' en la línea 18
-
-TABLA DE SÍMBOLOS (VARIABLES DECLARADAS)
-------------------------------------------------------------------------------
-#    NOMBRE              TIPO                LINEA
-------------------------------------------------------------------------------
-1    resultado           int                 2
-2    x                   int                 12
-3    p                   float               13
+20   }                       }               4
+21   void                    VOID            6
+22   main                    MAIN            6
+23   (                       (               6
+24   )                       )               6
+25   {                       {               6
+26   int                     INT             7
+27   [                       [               7
+28   5                       NUM_INT         7
+29   ]                       ]               7
+30   notas                   ID              7
+31   ;                       ;               7
+32   int                     INT             8
+33   x                       ID              8
+34   ;                       ;               8
+35   x                       ID              9
+36   =                       =               9
+37   notas                   ID              9
+38   [                       [               9
+39   0                       NUM_INT         9
+40   ]                       ]               9
+41   ;                       ;               9
+42   }                       }               10
+------------------------------------------------------------
+Total: 42 tokens
 
 DIAGNÓSTICO
-------------------------------------------------------------------------------
+------------------------------------------------------------
 Sin errores sintácticos.
 
-RESULTADO
-------------------------------------------------------------------------------
-Funciones reconocidas:          2
-Declaraciones reconocidas:      3
-Asignaciones reconocidas:       3
-Errores léxicos:               0
-Errores sintácticos:           0
-==============================================================================
+============================================================
 RESULTADO FINAL: PROGRAMA VÁLIDO

@@ -1,13 +1,13 @@
-==============================================================================
+============================================================
  ANALIZADOR LÉXICO Y SINTÁCTICO - LENGUAJE LP
- Proyecto integrador: parser con descenso recursivo
-==============================================================================
+ Entregable 1: estructura, declaraciones y asignaciones
+============================================================
 Archivo: casos_de_prueba/valido_basico.lp
 
-SECUENCIA DE TOKENS (ANÁLISIS LÉXICO)
-------------------------------------------------------------------------------
+SECUENCIA DE TOKENS
+------------------------------------------------------------
 #    LEXEMA                  TOKEN           LINEA
-------------------------------------------------------------------------------
+------------------------------------------------------------
 1    void                    VOID            1
 2    main                    MAIN            1
 3    (                       (               1
@@ -28,62 +28,12 @@ SECUENCIA DE TOKENS (ANÁLISIS LÉXICO)
 18   15.5                    NUM_DEC         5
 19   ;                       ;               5
 20   }                       }               6
-------------------------------------------------------------------------------
+------------------------------------------------------------
 Total: 20 tokens
 
-TRAZA DE RECONOCIMIENTO SINTÁCTICO
-------------------------------------------------------------------------------
-PROGRAMA
-  LISTA_FUNCIONES
-  PRINCIPAL
-    void
-    main ( )
-    BLOQUE
-      LISTA_VARIABLES
-        DECLARACION
-          TIPO
-            TIPO_BASE: int
-          LISTA_ID
-            id: edad (int)
-          PUNTO_COMA: ;
-        DECLARACION
-          TIPO
-            TIPO_BASE: float
-          LISTA_ID
-            id: promedio (float)
-          PUNTO_COMA: ;
-      COMANDOS
-        ASIGNACION
-          id: edad
-          ASIGNACION: =
-          COMPLEMENTO
-            COMPLEMENTO: 20
-          PUNTO_COMA: ;
-        ASIGNACION
-          id: promedio
-          ASIGNACION: =
-          COMPLEMENTO
-            COMPLEMENTO: 15.5
-          PUNTO_COMA: ;
-      BLOQUE: cierre '}' en la línea 6
-
-TABLA DE SÍMBOLOS (VARIABLES DECLARADAS)
-------------------------------------------------------------------------------
-#    NOMBRE              TIPO                LINEA
-------------------------------------------------------------------------------
-1    edad                int                 2
-2    promedio            float               3
-
 DIAGNÓSTICO
-------------------------------------------------------------------------------
+------------------------------------------------------------
 Sin errores sintácticos.
 
-RESULTADO
-------------------------------------------------------------------------------
-Funciones reconocidas:          0
-Declaraciones reconocidas:      2
-Asignaciones reconocidas:       2
-Errores léxicos:               0
-Errores sintácticos:           0
-==============================================================================
+============================================================
 RESULTADO FINAL: PROGRAMA VÁLIDO

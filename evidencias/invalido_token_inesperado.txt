@@ -1,13 +1,13 @@
-==============================================================================
+============================================================
  ANALIZADOR LÉXICO Y SINTÁCTICO - LENGUAJE LP
- Proyecto integrador: parser con descenso recursivo
-==============================================================================
+ Entregable 1: estructura, declaraciones y asignaciones
+============================================================
 Archivo: casos_de_prueba/invalido_token_inesperado.lp
 
-SECUENCIA DE TOKENS (ANÁLISIS LÉXICO)
-------------------------------------------------------------------------------
+SECUENCIA DE TOKENS
+------------------------------------------------------------
 #    LEXEMA                  TOKEN           LINEA
-------------------------------------------------------------------------------
+------------------------------------------------------------
 1    main                    MAIN            1
 2    (                       (               1
 3    )                       )               1
@@ -22,51 +22,15 @@ SECUENCIA DE TOKENS (ANÁLISIS LÉXICO)
 12   123                     NUM_INT         4
 13   ;                       ;               4
 14   }                       }               5
-------------------------------------------------------------------------------
+------------------------------------------------------------
 Total: 14 tokens
 
-TRAZA DE RECONOCIMIENTO SINTÁCTICO
-------------------------------------------------------------------------------
-PROGRAMA
-  LISTA_FUNCIONES
-  PRINCIPAL
-    main ( )
-    BLOQUE
-      LISTA_VARIABLES
-        DECLARACION
-          TIPO
-            TIPO_BASE: int
-          LISTA_ID
-            id: edad (int)
-          PUNTO_COMA: ;
-      COMANDOS
-        ASIGNACION
-          id: edad
-          ASIGNACION: =
-          COMPLEMENTO
-            COMPLEMENTO: 20
-          PUNTO_COMA: ;
-      BLOQUE: cierre '}' en la línea 5
-
-TABLA DE SÍMBOLOS (VARIABLES DECLARADAS)
-------------------------------------------------------------------------------
-#    NOMBRE              TIPO                LINEA
-------------------------------------------------------------------------------
-1    edad                int                 2
-
 DIAGNÓSTICO
-------------------------------------------------------------------------------
-[ERROR SINTACTICO] Línea 4: token inesperado '123' (NUM_INT); se esperaba lectura, escritura, asignación, func, if, while o return
+------------------------------------------------------------
+[ERROR SINTACTICO] Línea 4: se esperaba una asignación en COMANDO, pero se encontró '123' (NUM_INT)
       4 |     123;
         |     ^
-        Sugerencia: Revise la línea o la instrucción anterior.
+        Sugerencia: En esta etapa el bloque solo admite asignaciones.
 
-RESULTADO
-------------------------------------------------------------------------------
-Funciones reconocidas:          0
-Declaraciones reconocidas:      1
-Asignaciones reconocidas:       1
-Errores léxicos:               0
-Errores sintácticos:           1
-==============================================================================
+============================================================
 RESULTADO FINAL: PROGRAMA CON ERRORES
