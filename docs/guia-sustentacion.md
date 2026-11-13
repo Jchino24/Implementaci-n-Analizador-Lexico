@@ -57,7 +57,7 @@ motor del descenso recursivo.
 
 | Regla | Ejemplo correcto | Ejemplo incorrecto |
 |---|---|---|
-| `main` sin tipo | `main() { ... }` | `void main() { ... }` |
+| `main` con o sin `void` | `main() { ... }` / `void main() { ... }` | — |
 | Dimensiones antes del id | `int[10] notas;` | `int notas[10];` |
 | `func` sin `;` como comando | `func saludar()` | `func saludar();` |
 | `func` con `;` solo como complemento | `x = func f();` | — |
@@ -154,9 +154,9 @@ análisis semántico y la especificación pide mantenerlo separado.
 En el constructor de `Parser`: crea un `Lexer`, llama a `getNextToken()` y
 llena `tokens`/`flujo`.
 
-**¿Por qué `main()` no lleva `void`?**
-Porque la gramática define `PRINCIPAL -> main ( ) BLOQUE`. `void main()` no
-pertenece a la gramática.
+**¿Por qué se acepta `void main()`?**
+La gramática define `PRINCIPAL -> main ( ) BLOQUE`, pero el ejemplo del curso
+usa `void main()`. Se acepta `void` opcional antes de `main` por compatibilidad.
 
 **¿Por qué las dimensiones van antes del id?**
 Porque `TIPO -> TIPO_BASE DIMENSION`; el tipo completo incluye los corchetes:
@@ -209,7 +209,7 @@ cmake -S . -B build && cmake --build build -j
 ./build/analizador casos_de_prueba/invalido_falta_punto_coma.lp \
     --sin-tokens --sin-traza --sin-tabla
 
-# Suite: 35 casos
+# Suite: 34 casos
 ./pruebas/ejecutar_pruebas.sh
 ```
 
@@ -219,4 +219,4 @@ Mostrar en este orden:
 2. Traza con `DECLARACION_FUNCION`, `PRINCIPAL`, `BLOQUE`, `SELECCION`,
    `MIENTRAS`, `FUNCION`.
 3. Un error con línea, fragmento y sugerencia.
-4. `evidencias/resumen.txt`: 35/35.
+4. `evidencias/resumen.txt`: 34/34.

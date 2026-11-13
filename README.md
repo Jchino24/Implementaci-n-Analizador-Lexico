@@ -91,7 +91,9 @@ CONSTANTE               -> num_int | num_dec
 
 Consecuencias importantes:
 
-- **`main()` no lleva tipo de retorno**: es `main ( ) BLOQUE`, no `void main()`.
+- La gramática define `PRINCIPAL -> main ( ) BLOQUE`. El ejemplo del curso usa
+  `void main()`; el parser acepta `void` opcional antes de `main` por
+  compatibilidad.
 - **Las dimensiones van antes del identificador**: `int[10] notas;`, no
   `int notas[10];`.
 - **`func` no lleva `;` como comando**: `func saludar()`; el `;` pertenece a
@@ -119,7 +121,7 @@ Consecuencias importantes:
 │   ├── TablaSimbolos.h
 │   ├── Parser.h / Parser.cpp
 │   └── main.cpp
-├── casos_de_prueba/          # 12 válidos y 23 inválidos
+├── casos_de_prueba/          # 12 válidos y 22 inválidos
 ├── pruebas/ejecutar_pruebas.sh
 ├── evidencias/
 └── docs/guia-sustentacion.md
@@ -258,7 +260,6 @@ Salida:
 | Llamada sin `func` | `invalido_llamada_sin_func.lp` |
 | Llamada sin `(` | `invalido_llamada_sin_parentesis.lp` |
 | `else` sin `if` | `invalido_else_sin_if.lp` |
-| `void main()` | `invalido_void_main.lp` |
 | Token inesperado | `invalido_token_inesperado.lp` |
 | Carácter no reconocido | `invalido_caracter_no_reconocido.lp` |
 
@@ -274,14 +275,14 @@ Salida:
 ./pruebas/ejecutar_pruebas.sh --recompilar
 ```
 
-El script compila, ejecuta los 35 casos, compara código de salida y veredicto,
+El script compila, ejecuta los 34 casos, compara código de salida y veredicto,
 y guarda `evidencias/<caso>.txt` y `evidencias/resumen.txt`.
 
 Resultado actual:
 
 ```text
-Total de casos:  35
-Aprobados:       35
+Total de casos:  34
+Aprobados:       34
 Fallidos:        0
 ```
 
@@ -292,7 +293,7 @@ expresiones, llamadas, arreglos, sin variables, `scanf` y dimensiones.
 
 ## 10. Decisiones y limitaciones
 
-- Se sigue la gramática del docx al pie de la letra: `main()` sin tipo,
+- Se sigue la gramática del docx: `main()` (con `void` opcional por compatibilidad),
   dimensiones antes del identificador, `func` sin `;`, `return` con expresión,
   `scanf/println` restringidos y sin `else if` ni `for`.
 - No se realiza análisis semántico: no se comprueba declaración, tipos ni
