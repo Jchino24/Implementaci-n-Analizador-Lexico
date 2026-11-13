@@ -280,7 +280,11 @@ bool Parser::reconocerPrograma() {
 
     bool ok = reconocerListaFunciones();
 
-    if (!comprobar(MAIN)) {
+    // La gramática define PRINCIPAL -> main ( ) BLOQUE. Se acepta también
+    // void main() por compatibilidad con el ejemplo del curso.
+    const bool hayPrincipal =
+        comprobar(MAIN) || (comprobar(VOID) && siguienteEs(MAIN));
+    if (!hayPrincipal) {
         errorActual("'main' (PRINCIPAL)", "PROGRAMA",
                     "El programa debe terminar con main() y su bloque.");
         return false;
@@ -517,6 +521,13 @@ bool Parser::reconocerPrincipal() {
     CierreNodo cierre{this};
 
     bool ok = true;
+
+    // Compatibilidad con el ejemplo del curso: void main() { ... }.
+    if (comprobar(VOID) && siguienteEs(MAIN)) {
+        nodo("void");
+        avanzar();
+    }
+
     if (!consumir(MAIN)) {
         errorActual("'main'", "PRINCIPAL");
         return false;

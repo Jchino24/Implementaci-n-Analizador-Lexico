@@ -8,33 +8,35 @@ SECUENCIA DE TOKENS (ANÁLISIS LÉXICO)
 ------------------------------------------------------------------------------
 #    LEXEMA                  TOKEN           LINEA
 ------------------------------------------------------------------------------
-1    main                    MAIN            1
-2    (                       (               1
-3    )                       )               1
-4    {                       {               1
-5    int                     INT             2
-6    edad                    ID              2
-7    ;                       ;               2
-8    float                   FLOAT           3
-9    promedio                ID              3
-10   ;                       ;               3
-11   edad                    ID              4
-12   =                       =               4
-13   20                      NUM_INT         4
-14   ;                       ;               4
-15   promedio                ID              5
-16   =                       =               5
-17   15.5                    NUM_DEC         5
-18   ;                       ;               5
-19   }                       }               6
+1    void                    VOID            1
+2    main                    MAIN            1
+3    (                       (               1
+4    )                       )               1
+5    {                       {               1
+6    int                     INT             2
+7    edad                    ID              2
+8    ;                       ;               2
+9    float                   FLOAT           3
+10   promedio                ID              3
+11   ;                       ;               3
+12   edad                    ID              4
+13   =                       =               4
+14   20                      NUM_INT         4
+15   ;                       ;               4
+16   promedio                ID              5
+17   =                       =               5
+18   15.5                    NUM_DEC         5
+19   ;                       ;               5
+20   }                       }               6
 ------------------------------------------------------------------------------
-Total: 19 tokens
+Total: 20 tokens
 
 TRAZA DE RECONOCIMIENTO SINTÁCTICO
 ------------------------------------------------------------------------------
 PROGRAMA
   LISTA_FUNCIONES
   PRINCIPAL
+    void
     main ( )
     BLOQUE
       LISTA_VARIABLES

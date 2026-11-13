@@ -38,6 +38,7 @@ struct ErrorCompilacion {
 //   PARAMETROS              -> TIPO id LISTA_PARAMETROS | epsilon
 //   LISTA_PARAMETROS        -> , TIPO id LISTA_PARAMETROS | epsilon
 //   PRINCIPAL               -> main ( ) BLOQUE
+//                              (se acepta void main() por compatibilidad)
 //   BLOQUE                  -> { LISTA_VARIABLES COMANDOS }
 //   LISTA_VARIABLES         -> TIPO id LISTA_ID ; LISTA_VARIABLES | epsilon
 //   LISTA_ID                -> , id LISTA_ID | epsilon
