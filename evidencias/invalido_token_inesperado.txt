@@ -1,6 +1,6 @@
 ============================================================
  ANALIZADOR LÉXICO Y SINTÁCTICO - LENGUAJE LP
- Entregable 1: estructura, declaraciones y asignaciones
+ Entregable 2: gramática completa y AST
 ============================================================
 Archivo: casos_de_prueba/invalido_token_inesperado.lp
 
@@ -27,10 +27,9 @@ Total: 14 tokens
 
 DIAGNÓSTICO
 ------------------------------------------------------------
-[ERROR SINTACTICO] Línea 4: se esperaba una asignación en COMANDO, pero se encontró '123' (NUM_INT)
+[ERROR SINTACTICO] Línea 4: se esperaba una lectura, escritura, asignación, llamada, if, while o return en COMANDO, pero se encontró '123' (NUM_INT)
       4 |     123;
         |     ^
-        Sugerencia: En esta etapa el bloque solo admite asignaciones.
 
 ============================================================
 RESULTADO FINAL: PROGRAMA CON ERRORES

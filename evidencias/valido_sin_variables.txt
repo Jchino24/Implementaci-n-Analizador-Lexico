@@ -1,0 +1,77 @@
+============================================================
+ ANALIZADOR LÉXICO Y SINTÁCTICO - LENGUAJE LP
+ Entregable 2: gramática completa y AST
+============================================================
+Archivo: casos_de_prueba/valido_sin_variables.lp
+
+SECUENCIA DE TOKENS
+------------------------------------------------------------
+#    LEXEMA                  TOKEN           LINEA
+------------------------------------------------------------
+1    main                    MAIN            1
+2    (                       (               1
+3    )                       )               1
+4    {                       {               1
+5    println                 PRINTLN         2
+6    (                       (               2
+7    inicio                  TEXTO           2
+8    )                       )               2
+9    ;                       ;               2
+10   if                      IF              3
+11   (                       (               3
+12   1                       NUM_INT         3
+13   <                       COMP            3
+14   2                       NUM_INT         3
+15   )                       )               3
+16   {                       {               3
+17   println                 PRINTLN         4
+18   (                       (               4
+19   ok                      TEXTO           4
+20   )                       )               4
+21   ;                       ;               4
+22   }                       }               5
+23   while                   WHILE           6
+24   (                       (               6
+25   0                       NUM_INT         6
+26   )                       )               6
+27   {                       {               6
+28   println                 PRINTLN         7
+29   (                       (               7
+30   no                      TEXTO           7
+31   )                       )               7
+32   ;                       ;               7
+33   }                       }               8
+34   }                       }               9
+------------------------------------------------------------
+Total: 34 tokens
+
+DIAGNÓSTICO
+------------------------------------------------------------
+Sin errores sintácticos.
+
+ÁRBOL DE SINTAXIS ABSTRACTA (AST)
+------------------------------------------------------------
+Programa
+  Principal
+    Bloque
+      Escritura
+        Texto: inicio
+      If
+        Condicion
+          Binaria: <
+            Literal: 1
+            Literal: 2
+        Entonces
+          Bloque
+            Escritura
+              Texto: ok
+      While
+        Condicion
+          Literal: 0
+        Cuerpo
+          Bloque
+            Escritura
+              Texto: no
+
+============================================================
+RESULTADO FINAL: PROGRAMA VÁLIDO

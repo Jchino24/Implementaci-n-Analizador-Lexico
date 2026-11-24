@@ -1,0 +1,94 @@
+============================================================
+ ANALIZADOR LÉXICO Y SINTÁCTICO - LENGUAJE LP
+ Entregable 2: gramática completa y AST
+============================================================
+Archivo: casos_de_prueba/valido_while.lp
+
+SECUENCIA DE TOKENS
+------------------------------------------------------------
+#    LEXEMA                  TOKEN           LINEA
+------------------------------------------------------------
+1    main                    MAIN            1
+2    (                       (               1
+3    )                       )               1
+4    {                       {               1
+5    int                     INT             2
+6    contador                ID              2
+7    ;                       ;               2
+8    int                     INT             3
+9    suma                    ID              3
+10   ;                       ;               3
+11   contador                ID              4
+12   =                       =               4
+13   0                       NUM_INT         4
+14   ;                       ;               4
+15   suma                    ID              5
+16   =                       =               5
+17   0                       NUM_INT         5
+18   ;                       ;               5
+19   while                   WHILE           6
+20   (                       (               6
+21   contador                ID              6
+22   <                       COMP            6
+23   10                      NUM_INT         6
+24   )                       )               6
+25   {                       {               6
+26   suma                    ID              7
+27   =                       =               7
+28   suma                    ID              7
+29   +                       +               7
+30   contador                ID              7
+31   ;                       ;               7
+32   contador                ID              8
+33   =                       =               8
+34   contador                ID              8
+35   +                       +               8
+36   1                       NUM_INT         8
+37   ;                       ;               8
+38   }                       }               9
+39   println                 PRINTLN         10
+40   (                       (               10
+41   suma                    ID              10
+42   )                       )               10
+43   ;                       ;               10
+44   }                       }               11
+------------------------------------------------------------
+Total: 44 tokens
+
+DIAGNÓSTICO
+------------------------------------------------------------
+Sin errores sintácticos.
+
+ÁRBOL DE SINTAXIS ABSTRACTA (AST)
+------------------------------------------------------------
+Programa
+  Principal
+    Bloque
+      Declaracion: int
+        Variable: contador
+      Declaracion: int
+        Variable: suma
+      Asignacion: contador
+        Literal: 0
+      Asignacion: suma
+        Literal: 0
+      While
+        Condicion
+          Binaria: <
+            Identificador: contador
+            Literal: 10
+        Cuerpo
+          Bloque
+            Asignacion: suma
+              Binaria: +
+                Identificador: suma
+                Identificador: contador
+            Asignacion: contador
+              Binaria: +
+                Identificador: contador
+                Literal: 1
+      Escritura
+        Identificador: suma
+
+============================================================
+RESULTADO FINAL: PROGRAMA VÁLIDO

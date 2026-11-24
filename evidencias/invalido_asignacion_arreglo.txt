@@ -1,0 +1,40 @@
+============================================================
+ ANALIZADOR LÉXICO Y SINTÁCTICO - LENGUAJE LP
+ Entregable 2: gramática completa y AST
+============================================================
+Archivo: casos_de_prueba/invalido_asignacion_arreglo.lp
+
+SECUENCIA DE TOKENS
+------------------------------------------------------------
+#    LEXEMA                  TOKEN           LINEA
+------------------------------------------------------------
+1    main                    MAIN            1
+2    (                       (               1
+3    )                       )               1
+4    {                       {               1
+5    int                     INT             2
+6    [                       [               2
+7    5                       NUM_INT         2
+8    ]                       ]               2
+9    notas                   ID              2
+10   ;                       ;               2
+11   notas                   ID              3
+12   [                       [               3
+13   0                       NUM_INT         3
+14   ]                       ]               3
+15   =                       =               3
+16   1                       NUM_INT         3
+17   ;                       ;               3
+18   }                       }               4
+------------------------------------------------------------
+Total: 18 tokens
+
+DIAGNÓSTICO
+------------------------------------------------------------
+[ERROR SINTACTICO] Línea 3: se esperaba un identificador sin subíndices en la asignación en ASIGNACION, pero se encontró '['
+      3 |     notas[0] = 1;
+        |          ^
+        Sugerencia: La gramática no permite asignar a un elemento de arreglo.
+
+============================================================
+RESULTADO FINAL: PROGRAMA CON ERRORES

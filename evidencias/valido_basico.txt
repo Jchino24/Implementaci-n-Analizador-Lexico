@@ -1,6 +1,6 @@
 ============================================================
  ANALIZADOR LÉXICO Y SINTÁCTICO - LENGUAJE LP
- Entregable 1: estructura, declaraciones y asignaciones
+ Entregable 2: gramática completa y AST
 ============================================================
 Archivo: casos_de_prueba/valido_basico.lp
 
@@ -34,6 +34,20 @@ Total: 20 tokens
 DIAGNÓSTICO
 ------------------------------------------------------------
 Sin errores sintácticos.
+
+ÁRBOL DE SINTAXIS ABSTRACTA (AST)
+------------------------------------------------------------
+Programa
+  Principal: void
+    Bloque
+      Declaracion: int
+        Variable: edad
+      Declaracion: float
+        Variable: promedio
+      Asignacion: edad
+        Literal: 20
+      Asignacion: promedio
+        Literal: 15.5
 
 ============================================================
 RESULTADO FINAL: PROGRAMA VÁLIDO

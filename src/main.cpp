@@ -143,7 +143,7 @@ int main(int argc, char* argv[]) {
 
     std::cout << std::string(60, '=') << "\n";
     std::cout << " ANALIZADOR LÉXICO Y SINTÁCTICO - LENGUAJE LP\n";
-    std::cout << " Entregable 1: estructura, declaraciones y asignaciones\n";
+    std::cout << " Entregable 2: gramática completa y AST\n";
     std::cout << std::string(60, '=') << "\n";
     std::cout << "Archivo: " << ruta << "\n\n";
 
@@ -159,6 +159,13 @@ int main(int argc, char* argv[]) {
         for (const ErrorCompilacion& error : parser.obtenerErrores()) {
             imprimirError(error, parser.obtenerLineas());
         }
+    }
+
+    if (exito) {
+        std::cout << "ÁRBOL DE SINTAXIS ABSTRACTA (AST)\n";
+        std::cout << std::string(60, '-') << "\n";
+        imprimirAst(parser.obtenerAst(), std::cout);
+        std::cout << "\n";
     }
 
     std::cout << std::string(60, '=') << "\n";
